@@ -1,0 +1,28 @@
+
+Vid Länkningsproblem gör såhär:
+
+1: Gå in i filen som heter "projektnamnet".pro
+2: Högerklicka.
+3: Add Library.
+4: Välj vilken typ av bibliotek, för opencv är det External Library.
+5: Tryck på Browse vid Library File.
+6: Leta upp biblioteksfilen. Mina opencv hittade jag under /usr/lib
+7: markera rätt biblioteksfil, text libopencv_core.so
+8: Tryck open
+9: Next.
+10: Finish.
+11: sen dycker det upp typ det här i din "projektnamnet".pro fil
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../../../usr/lib/release/ -lopencv_highgui
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../../../usr/lib/debug/ -lopencv_highgui
+else:symbian: LIBS += -lopencv_highgui
+else:unix: LIBS += -L$$PWD/../../../../../../../usr/lib/ -lopencv_highgui
+
+INCLUDEPATH += $$PWD/../../../../../../../usr/include
+DEPENDPATH += $$PWD/../../../../../../../usr/include
+
+12: Nu är du klar, bygg programmet o.s.v, om du får det här felet där en tycker att du ska installera libgtk-2.0 och pkg-config så har du lyckats ta fel libfil, jag hade flera kvar sen tidigare försök när vi installerade utan ros. men tillslut hittade jag rätt.
+
+Mycket nöje.
+
+Maddmadare savior of code.
