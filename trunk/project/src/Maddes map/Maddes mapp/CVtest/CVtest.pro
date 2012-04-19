@@ -42,3 +42,14 @@ else:unix: LIBS += -L$$PWD/../../../../../../../usr/lib/ -lopencv_gpu
 
 INCLUDEPATH += $$PWD/../../../../../../../usr/include
 DEPENDPATH += $$PWD/../../../../../../../usr/include
+
+
+
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../../../../usr/lib/release/ -lopencv_imgproc
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../../../../usr/lib/debug/ -lopencv_imgproc
+else:symbian: LIBS += -lopencv_imgproc
+else:unix: LIBS += -L$$PWD/../../../../../../../../usr/lib/ -lopencv_imgproc
+
+INCLUDEPATH += $$PWD/../../../../../../../../usr/include
+DEPENDPATH += $$PWD/../../../../../../../../usr/include
