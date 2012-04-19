@@ -1,0 +1,15 @@
+
+Madde:
+	2012-04-19 Få svn att funka.
+	2012-04-19 Få opencv att funka.
+	2012-04-19 Inläsning och utläsning av bilder samt HoughCircleDetect och 	Hough Line detect.
+
+
+
+Koi:
+
+
+
+
+
+Danne:
