@@ -6,7 +6,7 @@ Vid Länkningsproblem gör såhär:
 3: Add Library.
 4: Välj vilken typ av bibliotek, för opencv är det External Library.
 5: Tryck på Browse vid Library File.
-6: Leta upp biblioteksfilen. Mina opencv hittade jag under /usr/lib
+6: Leta upp biblioteksfilen. Mina opencv libs hittade jag under /usr/lib
 7: markera rätt biblioteksfil, text libopencv_core.so
 8: Tryck open
 9: Next.
