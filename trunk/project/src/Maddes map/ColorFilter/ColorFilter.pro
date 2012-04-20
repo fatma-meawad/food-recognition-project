@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2012-04-19T11:39:50
+# Project created by QtCreator 2012-04-20T14:20:58
 #
 #-------------------------------------------------
 
@@ -8,7 +8,7 @@ QT       += core
 
 QT       -= gui
 
-TARGET = CVtest
+TARGET = ColorFilter
 CONFIG   += console
 CONFIG   -= app_bundle
 
@@ -16,6 +16,7 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp
+
 
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../../../usr/lib/release/ -lopencv_core
