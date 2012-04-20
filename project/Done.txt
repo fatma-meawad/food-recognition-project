@@ -3,7 +3,9 @@ Madde:
 	2012-04-19 Få svn att funka.
 	2012-04-19 Få opencv att funka.
 	2012-04-19 Inläsning och utläsning av bilder samt HoughCircleDetect och 	Hough Line detect.
-
+	2012-04-20 Tested UI-controls in opencv.
+	2012-04-20 Created an gaussian imagesmoother.
+	2012-04-20 Created a color filter project.
 
 
 Koi:
@@ -13,3 +15,7 @@ Koi:
 
 
 Danne:
+
+
+
+Deepak:
