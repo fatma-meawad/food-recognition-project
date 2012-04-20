@@ -1,0 +1,30 @@
+
+Vid Länkningsproblem gör såhär:
+
+If you have linking problems do this:
+
+1: Open your project solution.
+2: Open the file named "projectname".pro in the solution explorer in QT creator.
+3: Right click.
+4: Add Library.
+5: Chose library type, for opencv it's External Library.
+6: Press browse by "Library file".
+7: Find the library file, mine opencv ones was in /usr/lib
+8: Chose the right library file, i.e libopencv_core.so
+9: Open
+10: Next
+11: Finish
+12: This text will appear in your "projectname".pro file
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../../../../../usr/lib/release/ -lopencv_highgui
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../../../../../usr/lib/debug/ -lopencv_highgui
+else:symbian: LIBS += -lopencv_highgui
+else:unix: LIBS += -L$$PWD/../../../../../../../usr/lib/ -lopencv_highgui
+
+INCLUDEPATH += $$PWD/../../../../../../../usr/include
+DEPENDPATH += $$PWD/../../../../../../../usr/include
+
+12: You are now done.
+
+Best regards.
+Maddmadar savior of code.
