@@ -9,7 +9,7 @@ Madde:
 
 
 Koi:
-
+	2012-04-21 Got face detection, using sample code, to work
 
 
 
