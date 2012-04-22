@@ -18,9 +18,13 @@ static CvMemStorage* storage = 0;
 
 // Create a new Haar classifier
 static CvHaarClassifierCascade* cascade = 0;
+static CvHaarClassifierCascade* cascadeEye = 0;
 
 // Function prototype for detecting and drawing an object from an image
 void detect_and_draw( IplImage* image );
+
+// Function to find eyes
+IplImage* detect_eyes( IplImage* image );
 
 // Create a string that contains the cascade name
 const char* cascade_name =
@@ -191,11 +195,9 @@ int main( int argc, char** argv )
 
 // Function to detect and draw any faces that is present in an image
 void detect_and_draw( IplImage* img )
-{   IplImage *img2;
+{
+    IplImage *img2;
     int scale = 1;
-
-    // Create a new image based on the input image
-    IplImage* temp = cvCreateImage( cvSize(img->width/scale,img->height/scale), 8, 3 );
 
     // Create two points to represent the face locations
     CvPoint pt1, pt2;
@@ -233,16 +235,59 @@ void detect_and_draw( IplImage* img )
             cvSetImageROI(img1,cvRect(pt1.x,pt1.y,(pt2.x-pt1.x),(pt2.y-pt1.y)));
             img2=cvCloneImage(img1);
             cvResetImageROI(img1);
-            //cvSetImageROI(img,cvRect(pt1.x,pt1.y,(pt2.x-pt1.x),(pt2.y-pt1.y)));;
-            // Draw the rectangle in the input image
             //cvRectangle( img, pt1, pt2, CV_RGB(255,0,0), 3, 8, 0 );
+        }
+
+        if(faces ? faces->total : 0){
+            detect_eyes(img2);
+            cvShowImage("result", img2);
 
         }
+
+    }
+}
+
+// Function to detect eyes
+IplImage* detect_eyes( IplImage* img )
+{
+    int scale = 1;
+
+    // Create two points to represent the face locations
+    CvPoint pt1, pt2;
+    int i;
+
+    // Clear the memory storage which was used before
+    cvClearMemStorage( storage );
+
+    cascadeEye = (CvHaarClassifierCascade*)cvLoad( "/home/koi/opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
+
+    // Find whether the cascade is loaded, to find the faces. If yes, then:
+    if( cascadeEye )
+    {
+
+        // There can be more than one face in an image. So create a growable sequence of faces.
+        // Detect the objects and store them in the sequence
+        CvSeq* faces = cvHaarDetectObjects( img, cascadeEye, storage,
+                                            1.1, 2, CV_HAAR_DO_CANNY_PRUNING,
+                                            cvSize(40, 40) );
+
+        // Loop the number of faces found.
+        for( i = 0; i < (faces ? faces->total : 0); i++ )
+        {
+           // Create a new rectangle for drawing the face
+            CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
+
+            // Find the dimensions of the face,and scale it if necessary
+            pt1.x = r->x*scale;
+            pt2.x = (r->x+r->width)*scale;
+            pt1.y = r->y*scale;
+            pt2.y = (r->y+r->height)*scale;
+
+            cvRectangle( img, pt1, pt2, CV_RGB(255,0,0), 3, 8, 0 );
+        }
+
     }
 
-    // Show the image in the window named "result"
-    cvShowImage( "result", img2 );
-
-    // Release the temp image created.
-    cvReleaseImage( &temp );
+    return img;
 }
+
