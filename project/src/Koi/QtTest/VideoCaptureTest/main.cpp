@@ -191,7 +191,7 @@ int main( int argc, char** argv )
 
 // Function to detect and draw any faces that is present in an image
 void detect_and_draw( IplImage* img )
-{
+{   IplImage *img2;
     int scale = 1;
 
     // Create a new image based on the input image
@@ -226,13 +226,22 @@ void detect_and_draw( IplImage* img )
             pt1.y = r->y*scale;
             pt2.y = (r->y+r->height)*scale;
 
+
+            IplImage *img1 = cvCloneImage(img);
+
+
+            cvSetImageROI(img1,cvRect(pt1.x,pt1.y,(pt2.x-pt1.x),(pt2.y-pt1.y)));
+            img2=cvCloneImage(img1);
+            cvResetImageROI(img1);
+            //cvSetImageROI(img,cvRect(pt1.x,pt1.y,(pt2.x-pt1.x),(pt2.y-pt1.y)));;
             // Draw the rectangle in the input image
-            cvRectangle( img, pt1, pt2, CV_RGB(255,0,0), 3, 8, 0 );
+            //cvRectangle( img, pt1, pt2, CV_RGB(255,0,0), 3, 8, 0 );
+
         }
     }
 
     // Show the image in the window named "result"
-    cvShowImage( "result", img );
+    cvShowImage( "result", img2 );
 
     // Release the temp image created.
     cvReleaseImage( &temp );
