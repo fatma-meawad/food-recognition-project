@@ -5,6 +5,7 @@ Madde:
 -Stable ROI
 -class holding useful data (face, eyes, filter(?))
 -Load haar-feature, find face, send ROI to eyeDetection
+-showImage after getting it back from eyeDetection
 
 Koi:
 
