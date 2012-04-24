@@ -48,7 +48,7 @@ int main( int argc, char** argv )
         input_name = argv[1];
 
     // Load the HaarClassifierCascade
-    cascade = (CvHaarClassifierCascade*)cvLoad( "/home/koi/opencv/data/haarcascades/haarcascade_frontalface_alt.xml", 0, 0, 0 );
+    cascade = (CvHaarClassifierCascade*)cvLoad( "/home/blacktemple/opencv/data/haarcascades/haarcascade_frontalface_alt.xml", 0, 0, 0 );
 
     // Check whether the cascade has loaded successfully. Else report and error and quit
     if( !cascade )
@@ -62,7 +62,7 @@ int main( int argc, char** argv )
 
     // Find whether to detect the object from file or from camera.
     if( !input_name || (isdigit(input_name[0]) && input_name[1] == '\0') )
-        capture = cvCaptureFromCAM( !input_name ? 0 : input_name[0] - '0' );
+        capture = cvCaptureFromCAM( CV_CAP_ANY );
     else
         capture = cvCaptureFromAVI( input_name );
 
@@ -110,6 +110,8 @@ int main( int argc, char** argv )
         cvReleaseImage( &frame_copy );
         cvReleaseCapture( &capture );
     }
+    else
+        return -3;
 
 }
 
@@ -166,6 +168,8 @@ void detect_and_draw( IplImage* img )
 
             cvShowImage("result", faceImg);
         }
+        else
+            cvShowImage("result", img);
         cvReleaseImage(&faceImg);
     }
 }
@@ -183,7 +187,7 @@ bool detect_eyes( IplImage* img )
     // Clear the memory storage which was used before
     cvClearMemStorage( storage );
 
-    cascadeEye = (CvHaarClassifierCascade*)cvLoad( "/home/koi/opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
+    cascadeEye = (CvHaarClassifierCascade*)cvLoad( "/home/blacktemple/opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
 
     // Find whether the cascade is loaded, to find the faces. If yes, then:
     if( cascadeEye )
