@@ -24,12 +24,11 @@ static CvHaarClassifierCascade* cascadeEye = 0;
 void detect_and_draw( IplImage* image );
 
 // Function to find eyes
-IplImage* detect_eyes( IplImage* image );
+bool detect_eyes( IplImage* image );
 
-// Create a string that contains the cascade name
-const char* cascade_name =
-    "haarcascade_frontalface_alt.xml";
-/*    "haarcascade_profileface.xml";*/
+// Global points for ROI
+CvPoint g1 = cvPoint(0,0);
+CvPoint g2 = g1;
 
 // Main function, defines the entry point for the program.
 int main( int argc, char** argv )
@@ -41,28 +40,15 @@ int main( int argc, char** argv )
     // Images to capture the frame from video or camera or from file
     IplImage *frame, *frame_copy = 0;
 
-    // Used for calculations
-    int optlen = strlen("--cascade=");
-
     // Input file name for avi or image file.
-    const char* input_name;
+    const char* input_name = 0;
 
     // Check for the correct usage of the command line
-    if( argc > 1 && strncmp( argv[1], "--cascade=", optlen ) == 0 )
-    {
-        cascade_name = argv[1] + optlen;
-        input_name = argc > 2 ? argv[2] : 0;
-    }
-    else
-    {
-        fprintf( stderr,
-        "Usage: facedetect --cascade=\"<cascade_path>\" [filename|camera_index]\n" );
-        return -1;
-        /*input_name = argc > 1 ? argv[1] : 0;*/
-    }
+    if( argc > 1)
+        input_name = argv[1];
 
     // Load the HaarClassifierCascade
-    cascade = (CvHaarClassifierCascade*)cvLoad( cascade_name, 0, 0, 0 );
+    cascade = (CvHaarClassifierCascade*)cvLoad( "/home/koi/opencv/data/haarcascades/haarcascade_frontalface_alt.xml", 0, 0, 0 );
 
     // Check whether the cascade has loaded successfully. Else report and error and quit
     if( !cascade )
@@ -125,78 +111,12 @@ int main( int argc, char** argv )
         cvReleaseCapture( &capture );
     }
 
-    // If the capture is not loaded succesfully, then:
-    else
-    {
-        // Assume the image to be lena.jpg, or the input_name specified
-        const char* filename = input_name ? input_name : (char*)"lena.jpg";
-
-        // Load the image from that filename
-        IplImage* image = cvLoadImage( filename, 1 );
-
-        // If Image is loaded succesfully, then:
-        if( image )
-        {
-            // Detect and draw the face
-            detect_and_draw( image );
-
-            // Wait for user input
-            cvWaitKey(0);
-
-            // Release the image memory
-            cvReleaseImage( &image );
-        }
-        else
-        {
-            /* assume it is a text file containing the
-               list of the image filenames to be processed - one per line */
-            FILE* f = fopen( filename, "rt" );
-            if( f )
-            {
-                char buf[1000+1];
-
-                // Get the line from the file
-                while( fgets( buf, 1000, f ) )
-                {
-
-                    // Remove the spaces if any, and clean up the name
-                    int len = (int)strlen(buf);
-                    while( len > 0 && isspace(buf[len-1]) )
-                        len--;
-                    buf[len] = '\0';
-
-                    // Load the image from the filename present in the buffer
-                    image = cvLoadImage( buf, 1 );
-
-                    // If the image was loaded succesfully, then:
-                    if( image )
-                    {
-                        // Detect and draw the face from the image
-                        detect_and_draw( image );
-
-                        // Wait for the user input, and release the memory
-                        cvWaitKey(0);
-                        cvReleaseImage( &image );
-                    }
-                }
-                // Close the file
-                fclose(f);
-            }
-        }
-
-    }
-
-    // Destroy the window previously created with filename: "result"
-    cvDestroyWindow("result");
-
-    // return 0 to indicate successfull execution of the program
-    return 0;
 }
 
 // Function to detect and draw any faces that is present in an image
 void detect_and_draw( IplImage* img )
 {
-    IplImage *img2;
+    IplImage *faceImg = 0;
     int scale = 1;
 
     // Create two points to represent the face locations
@@ -219,7 +139,7 @@ void detect_and_draw( IplImage* img )
         // Loop the number of faces found.
         for( i = 0; i < (faces ? faces->total : 0); i++ )
         {
-           // Create a new rectangle for drawing the face
+            // Create a new rectangle for drawing the face
             CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
 
             // Find the dimensions of the face,and scale it if necessary
@@ -228,29 +148,33 @@ void detect_and_draw( IplImage* img )
             pt1.y = r->y*scale;
             pt2.y = (r->y+r->height)*scale;
 
+            // Clone the original image
+            IplImage *cloneImg = cvCloneImage(img);
 
-            IplImage *img1 = cvCloneImage(img);
+            // Set Region Of Interest where the face is located
+            cvSetImageROI(cloneImg,cvRect(pt1.x,pt1.y,(pt2.x-pt1.x),(pt2.y-pt1.y)));
+            faceImg=cvCloneImage(cloneImg);
+            cvResetImageROI(cloneImg);
 
-
-            cvSetImageROI(img1,cvRect(pt1.x,pt1.y,(pt2.x-pt1.x),(pt2.y-pt1.y)));
-            img2=cvCloneImage(img1);
-            cvResetImageROI(img1);
-            //cvRectangle( img, pt1, pt2, CV_RGB(255,0,0), 3, 8, 0 );
+            // Free the image
+            cvReleaseImage( &cloneImg );
         }
 
         if(faces ? faces->total : 0){
-            detect_eyes(img2);
-            cvShowImage("result", img2);
+            if(detect_eyes(faceImg))
+                g1 = pt1;
 
+            cvShowImage("result", faceImg);
         }
-
+        cvReleaseImage(&faceImg);
     }
 }
 
 // Function to detect eyes
-IplImage* detect_eyes( IplImage* img )
+bool detect_eyes( IplImage* img )
 {
     int scale = 1;
+    bool twoEyes = false;
 
     // Create two points to represent the face locations
     CvPoint pt1, pt2;
@@ -264,18 +188,16 @@ IplImage* detect_eyes( IplImage* img )
     // Find whether the cascade is loaded, to find the faces. If yes, then:
     if( cascadeEye )
     {
-
-        // There can be more than one face in an image. So create a growable sequence of faces.
-        // Detect the objects and store them in the sequence
-        CvSeq* faces = cvHaarDetectObjects( img, cascadeEye, storage,
+        // Haar feature for eyes
+        CvSeq* eyes = cvHaarDetectObjects( img, cascadeEye, storage,
                                             1.1, 2, CV_HAAR_DO_CANNY_PRUNING,
                                             cvSize(40, 40) );
 
-        // Loop the number of faces found.
-        for( i = 0; i < (faces ? faces->total : 0); i++ )
+        // Loop the number of eyes found.
+        for( i = 0; i < (eyes ? eyes->total : 0); i++ )
         {
-           // Create a new rectangle for drawing the face
-            CvRect* r = (CvRect*)cvGetSeqElem( faces, i );
+            // Create a new rectangle for drawing the face
+            CvRect* r = (CvRect*)cvGetSeqElem( eyes, i );
 
             // Find the dimensions of the face,and scale it if necessary
             pt1.x = r->x*scale;
@@ -283,11 +205,20 @@ IplImage* detect_eyes( IplImage* img )
             pt1.y = r->y*scale;
             pt2.y = (r->y+r->height)*scale;
 
+            // Draw rectangles where the eyes are located
             cvRectangle( img, pt1, pt2, CV_RGB(255,0,0), 3, 8, 0 );
         }
 
-    }
+        if(eyes->total > 1)
+            twoEyes = true;
 
-    return img;
+        // Put number of eyes on the screen
+        CvFont font;
+        char str[20];
+        sprintf(str,"Eyes: %d",eyes->total);
+        cvInitFont(&font,CV_FONT_HERSHEY_PLAIN, 1.0,1.0,0,1);
+        cvPutText (img, str,cvPoint(20,20), &font, cvScalar(0,0,0));
+    }
+    return twoEyes;
 }
 
