@@ -2,8 +2,20 @@
 
 Madde:
 
+-Stable ROI
+-class holding useful data (face, eyes, filter(?))
+-Load haar-feature, find face, send ROI to eyeDetection
+
 Koi:
 
+... I really don't know ...
+Try this :D
+./VideoCaptureTest ~/opencv/samples/cpp/tutorial_code/HighGUI/video-input-psnr-ssim/video/Megamind.avi
+
 Danne:
+
+-Load haar-feature for eyes
+-Find eyes (previous position)
+-Send back eyePos (x,y) to faceDetection
 
 Deepak:
