@@ -22,4 +22,7 @@ HEADERS += \
     videocapture.h \
     Includes.h
 
+unix:!macx:!symbian: LIBS += -L$$PWD/../../../../../../../usr/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc
 
+INCLUDEPATH += $$PWD/../../../../../../../usr/include
+DEPENDPATH += $$PWD/../../../../../../../usr/include
