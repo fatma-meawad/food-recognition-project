@@ -26,3 +26,6 @@ unix:!macx:!symbian: LIBS += -L$$PWD/../../../../usr/local/lib/ -lopencv_core -l
 
 INCLUDEPATH += $$PWD/../../../../usr/local/include
 DEPENDPATH += $$PWD/../../../../usr/local/include
+
+HEADERS += \
+    head.h
