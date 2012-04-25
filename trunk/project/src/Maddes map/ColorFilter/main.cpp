@@ -1,8 +1,8 @@
 
 #include <iostream>
-#include <opencv-2.3.1/opencv/cv.h>
-#include <opencv-2.3.1/opencv/highgui.h>
-#include <opencv-2.3.1/opencv2/imgproc/imgproc_c.h>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
+#include <opencv2/imgproc/imgproc_c.h>
 #include <math.h>
 
 
@@ -78,6 +78,9 @@ int main(int argc, char *argv[])
     cvCreateTrackbar("Max Blue","Color filter",&smoothlevel,255, Maxblue_callback);
 
     OpImage = cvCreateImage(cvSize(InputImage->width,InputImage->height),InputImage->depth,InputImage->nChannels);
+
+
+    printf("HEJ");
 
     while(1)
     {
