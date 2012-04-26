@@ -16,13 +16,18 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    videocapture.cpp
+    videocapture.cpp \
+    videodetection.cpp
 
 HEADERS += \
     videocapture.h \
-    Includes.h
+    Includes.h \
+    videodetection.h
 
-unix:!macx:!symbian: LIBS += -L$$PWD/../../../../../../../usr/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc
+unix:!macx:!symbian: LIBS += -L$$PWD/../../../../../../../usr/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_objdetect
+
+
+
 
 INCLUDEPATH += $$PWD/../../../../../../../usr/include
 DEPENDPATH += $$PWD/../../../../../../../usr/include
