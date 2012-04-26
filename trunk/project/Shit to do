@@ -1,0 +1,38 @@
+
+
+Classes we need:
+
+HIGH A data class, head or something.
+	storing feature data.
+	position of face etc.
+
+HIGH A feature class.
+	stores featuredata for head.
+
+DONE A class for image updating and initializing, done. input: nothing output: video frames.
+	initializing a camera feed
+	updates the frames
+
+LOW A class for pulse class, input: headinfo and images, return: pulse.
+	calculates the pulse from images
+
+LOW A class for blinking, input: headinfo and images, return: eye info.
+	checks if the eyes are open or not
+	gives you the blinking frequency
+
+LOW A breathing class, input: return: breathing frequency.
+	analyzes the breating of the videofeed.
+
+HIGH A preprocessing class, input: image, return: refined image.
+	refines the image in some way
+
+HIGH A detection class, input: image, return: head
+	finds all the features and sets the data in teh dataclass.
+
+LOW A paintingclass, input: image and data, return: graphs or something.
+	draws graphs and shit depending on the data
+
+LOW A decision class, input: data, return: tiredness
+	fuzzy computation model for the amount of tiredness based
+	on breathing, pulse and blinking frequency.
+
