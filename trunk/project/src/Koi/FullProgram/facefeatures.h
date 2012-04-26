@@ -10,6 +10,10 @@ class Facefeatures
     CvRect mRightEye;
     CvRect mNose;
     CvRect mMouth;
+
+public:
+
+    CvPoint center(CvRect rect);
 };
 
 #endif // FACEFEATURES_H
