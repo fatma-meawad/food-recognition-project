@@ -28,7 +28,7 @@ void Preprocessing::MakeGrayscale(IplImage * Image)
    //cvCvtColor(Image,Image,CV_RGB2GRAY);
 }
 
-//IplImage * Preprocessing::Stabilize(Facefeatures Inputfeatures, IplImage * Image)
-//{
-//    return Image;
-//}
+IplImage * Preprocessing::Stabilize(Facefeatures* Inputfeatures, IplImage * Image)
+{
+    return Image;
+}
