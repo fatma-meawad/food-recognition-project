@@ -17,12 +17,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp \
     videocapture.cpp \
-    videodetection.cpp
+    head.cpp
 
 HEADERS += \
     videocapture.h \
     Includes.h \
-    videodetection.h
+    head.h
 
 unix:!macx:!symbian: LIBS += -L$$PWD/../../../../../../../usr/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_objdetect
 
