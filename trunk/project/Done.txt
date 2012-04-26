@@ -1,4 +1,4 @@
-
+﻿
 Madde:
 	2012-04-19 Få svn att funka.
 	2012-04-19 Få opencv att funka.
@@ -19,4 +19,10 @@ Danne:
 
 
 
+
+
 Deepak:
+
+2012-04-22 Research on the applications in the current industry
+2012-04-24 Testing predefined applications for respiration
+2012-04-25 Searched for reference papers
