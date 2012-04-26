@@ -39,3 +39,6 @@ HEADERS += \
     featuredetecition.h \
     fuzzymodel.h \
     Includes.h
+
+unix:!macx:!symbian: LIBS += -L$$PWD/../../../../../../../usr/lib/ -lopencv_highgui -lopencv_core -lopencv_imgproc -lopencv_objdetect
+
