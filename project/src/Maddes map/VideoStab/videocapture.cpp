@@ -19,7 +19,7 @@ int videocapture::Init(int camMode)
 
     switch(cm)
     {
-    case 0:
+    case ANY_CAM:
         this->capture = cvCaptureFromCAM(-1);
         if(!this->capture)
         {

@@ -3,6 +3,10 @@
 
 class Data
 {
+    int pulsefreq;
+    int breathingfreq;
+    int blinkingfreq;
+
 public:
     Data();
 };
