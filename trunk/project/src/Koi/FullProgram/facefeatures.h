@@ -5,6 +5,8 @@
 
 class Facefeatures
 {
+public:
+    Facefeatures();
 };
 
 #endif // FACEFEATURES_H
