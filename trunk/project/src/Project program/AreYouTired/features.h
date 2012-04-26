@@ -3,8 +3,11 @@
 
 class Features
 {
+    CvRect mFace, mLeftEye, mRightEye; //Possible nose, mouth etc
+
 public:
     Features();
 };
 
 #endif // FEATURES_H
+

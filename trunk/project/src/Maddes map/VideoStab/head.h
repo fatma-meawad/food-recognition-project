@@ -26,7 +26,6 @@ class FindFeatures
 
     void findEyes(IplImage* img, Head* oldHead, Head* newHead);        // Use image from findFace to find eyes, set eyes in new head    paint
 
-
 };
 
 #endif // HEAD_H

@@ -1,8 +1,6 @@
-
-
 Classes we need:
 
-HIGH A data class, head or something.
+LOW A data class, head or something.
 	storing feature data.
 	position of face etc.
 
