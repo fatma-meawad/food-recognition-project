@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
     while(true)
     {
         VC.UpdateFrame();
+        Preprocessing::MakeGrayscale(VC.CurrentFrame);
         cvShowImage("asd",VC.CurrentFrame);
 
         if(cvWaitKey(15) == 27)
