@@ -5,8 +5,11 @@
 
 class Facefeatures
 {
-public:
-    Facefeatures();
+    CvRect mFace;
+    CvRect mLeftEye;
+    CvRect mRightEye;
+    CvRect mNose;
+    CvRect mMouth;
 };
 
 #endif // FACEFEATURES_H
