@@ -17,3 +17,11 @@
 
 
 #endif // INCLUDES_H
+
+#include "opencv/cv.h"
+#include "opencv2/video/video.hpp"
+#include "opencv/highgui.h"
+#include "opencv2/video/tracking.hpp"
+
+using namespace std;
+using namespace cv;

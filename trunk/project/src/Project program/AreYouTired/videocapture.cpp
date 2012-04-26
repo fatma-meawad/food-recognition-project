@@ -1,8 +1,4 @@
 #include "videocapture.h"
-#include "Includes.h"
-
-using namespace cv;
-using namespace std;
 
 Videocapture::Videocapture()
 {

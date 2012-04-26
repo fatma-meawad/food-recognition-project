@@ -7,7 +7,8 @@ class Preprocessing
 {
 public:
     Preprocessing();
-    IplImage * MakeGrayscale(IplImage *);
+    void MakeGrayscale(IplImage *);
+    IplImage * Crop(CvRect,IplImage*);
 
 };
 
