@@ -1,12 +1,9 @@
-//#include "Includes.h"
-
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include "Includes.h"
 
 int main(int argc, char *argv[])
 {
-    /*videocapture VC;
-    VC.Init(ANY_CAM);
+    Videocapture VC;
+    VC.Init(CV_CAP_ANY);
 
     cvNamedWindow("asd",CV_WINDOW_AUTOSIZE);
 
@@ -15,10 +12,10 @@ int main(int argc, char *argv[])
     while(true)
     {
         VC.UpdateFrame();
-        cvShowImage("asd",VD.CurrentImage);
+        cvShowImage("asd",VC.CurrentFrame);
 
         if(cvWaitKey(15) == 27)
                 break;
     }
-*/
+
 }
