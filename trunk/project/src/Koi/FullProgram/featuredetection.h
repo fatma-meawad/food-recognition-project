@@ -7,6 +7,7 @@ class Featuredetection
 {
 public:
     Featuredetection();
+    Facefeatures detectfeatures(IplImage* img);
 };
 
 #endif // FEATUREDETECTION_H
