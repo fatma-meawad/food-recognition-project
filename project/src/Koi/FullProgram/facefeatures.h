@@ -5,13 +5,14 @@
 
 class Facefeatures
 {
+
+public:
+
     CvRect mFace;
     CvRect mLeftEye;
     CvRect mRightEye;
     CvRect mNose;
     CvRect mMouth;
-
-public:
 
     CvPoint center(CvRect rect);
 };
