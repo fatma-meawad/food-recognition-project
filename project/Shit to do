@@ -24,7 +24,7 @@ LOW A breathing class, input: return: breathing frequency.
 HIGH A preprocessing class, input: image, return: refined image.
 	refines the image in some way
 
-HIGH A detection class, input: image, return: head
+HIGH A detection class, input: image, return: features
 	finds all the features and sets the data in teh dataclass.
 
 LOW A paintingclass, input: image and data, return: graphs or something.

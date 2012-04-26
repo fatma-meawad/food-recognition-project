@@ -1,10 +1,10 @@
-#ifndef FEATUREDETECITION_H
-#define FEATUREDETECITION_H
+#ifndef FEATUREDETECTION_H
+#define FEATUREDETECTION_H
 
-class Featuredetecition
+class Featuredetection
 {
 public:
-    Featuredetecition();
+    Featuredetection();
 };
 
-#endif // FEATUREDETECITION_H
+#endif // FEATUREDETECTION_H

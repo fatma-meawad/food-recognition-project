@@ -1,5 +1,5 @@
-#include "featuredetecition.h"
+#include "featuredetection.h"
 
-Featuredetecition::Featuredetecition()
+Featuredetection::Featuredetection()
 {
 }
