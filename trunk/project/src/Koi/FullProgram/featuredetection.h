@@ -3,6 +3,8 @@
 
 #include "Includes.h"
 
+class Facefeatures;
+
 class Featuredetection
 {
 public:
