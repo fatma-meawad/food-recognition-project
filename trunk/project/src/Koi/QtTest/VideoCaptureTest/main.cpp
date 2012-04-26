@@ -48,7 +48,7 @@ int main( int argc, char** argv )
         input_name = argv[1];
 
     // Load the HaarClassifierCascade
-    cascade = (CvHaarClassifierCascade*)cvLoad( "/home/blacktemple/opencv/data/haarcascades/haarcascade_frontalface_alt.xml", 0, 0, 0 );
+    cascade = (CvHaarClassifierCascade*)cvLoad( "/home/koi/opencv/data/haarcascades/haarcascade_frontalface_alt.xml", 0, 0, 0 );
 
     // Check whether the cascade has loaded successfully. Else report and error and quit
     if( !cascade )
@@ -187,7 +187,7 @@ bool detect_eyes( IplImage* img )
     // Clear the memory storage which was used before
     cvClearMemStorage( storage );
 
-    cascadeEye = (CvHaarClassifierCascade*)cvLoad( "/home/blacktemple/opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
+    cascadeEye = (CvHaarClassifierCascade*)cvLoad( "/home/koi/opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
 
     // Find whether the cascade is loaded, to find the faces. If yes, then:
     if( cascadeEye )
