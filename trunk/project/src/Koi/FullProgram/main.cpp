@@ -14,6 +14,19 @@ int main(int argc, char *argv[])
     Featuredetection f;
     IplImage * temp;
 
+    list<Data> status;
+    Data d1;
+
+    for(int i = 0; i < 10; i++){
+        d1.blinkingfreq = i; d1.breathingfreq = i+1; d1.pulsefreq = i-1;
+
+        status.push_back(d1);
+    }
+
+    Painting::drawGraph(status);
+
+
+
     cvNamedWindow("asd",CV_WINDOW_AUTOSIZE);
 
     //cvWaitKey(0);
