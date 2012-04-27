@@ -5,8 +5,13 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
+#include <opencv2/objdetect/objdetect.hpp>
 
 #include <iostream>
+#include <stdlib.h>
+#include <queue>
+#include <list>
+#include <math.h>
 
 #include "blinking.h"
 #include "breathing.h"
