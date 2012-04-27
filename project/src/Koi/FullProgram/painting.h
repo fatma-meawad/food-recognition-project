@@ -3,16 +3,19 @@
 
 #include "Includes.h"
 
+class Facefeatures;
+
 class Painting
 {
 public:
     Painting();
 
-    IplImage* drawHairCross(IplImage*, CvPoint);
-    IplImage* drawRect(IplImage*, CvRect);
-    IplImage* drawCircle(IplImage*, CvPoint);
+    static IplImage* drawFullFace(IplImage*, Facefeatures*);
+    static IplImage* drawHairCross(IplImage*, CvPoint);
+    static IplImage* drawRect(IplImage*, CvRect);
+    static IplImage* drawCircle(IplImage*, CvPoint);
 
-    void drawGraph();
+    static void drawGraph();
 };
 
 #endif // PAINTING_H

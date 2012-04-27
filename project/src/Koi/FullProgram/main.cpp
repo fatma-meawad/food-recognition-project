@@ -23,11 +23,12 @@ int main(int argc, char *argv[])
 
        face = f.detectfeatures(VC.CurrentFrame);
 
+       Painting::drawFullFace(VC.CurrentFrame,&face);  // Paint test
 
       // cvDrawRect(VC.CurrentFrame,cvPoint(face.mFace.x,face.mFace.y),cvPoint(face.mFace.x + face.mFace.width,face.mFace.y + face.mFace.height),cvScalar(0x00,0x00,0x00),1,8,0);
 
-        temp = p.Stabilize(VC.CurrentFrame, &face);
-        cvShowImage("asd",temp);
+        //temp = p.Stabilize(VC.CurrentFrame, &face);
+        cvShowImage("asd",VC.CurrentFrame);
 
         if(cvWaitKey(5) == 27)
                 break;
