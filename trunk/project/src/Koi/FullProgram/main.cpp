@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
     Featuredetection f;
     IplImage * temp;
 
-    list<Data> status;
+    list<Data> status;      // Test för grafutritning ... :)
     Data d1;
 
     for(int i = 0; i < 10; i++){
