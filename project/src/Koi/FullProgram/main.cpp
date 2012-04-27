@@ -7,6 +7,8 @@ int main(int argc, char *argv[])
 {
     Videocapture VC;
     Facefeatures face;
+    Facefeatures old_face;
+    old_face.mFace.x=-1;   // säger att old_face inte är användbar;
     VC.Init(CV_CAP_ANY);
     Preprocessing p;
     Featuredetection f;
@@ -21,7 +23,8 @@ int main(int argc, char *argv[])
         VC.UpdateFrame();
        // Preprocessing::MakeGrayscale(VC.CurrentFrame);
 
-       face = f.detectfeatures(VC.CurrentFrame);
+       face = f.detectfeatures(VC.CurrentFrame,old_face);
+       old_face=face;
 
        Painting::drawFullFace(VC.CurrentFrame,&face);  // Paint test
 
