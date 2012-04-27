@@ -5,8 +5,8 @@ Painting::Painting()
 }
 // Draw haircross
 IplImage* Painting::drawHairCross(IplImage* img, CvPoint p){
-    cvLine(img,cvPoint(p.x-5,p.y),cvPoint(p.x+5,p.y),cvScalar(100,0,100), 2);
-    cvLine(img,cvPoint(p.x,p.y-5),cvPoint(p.x,p.y+5),cvScalar(100,0,100), 2);
+    cvLine(img,cvPoint(p.x-15,p.y),cvPoint(p.x+15,p.y),cvScalar(100,0,100), 1);
+    cvLine(img,cvPoint(p.x,p.y-15),cvPoint(p.x,p.y+15),cvScalar(100,0,100), 1);
 
     return img;
 }
