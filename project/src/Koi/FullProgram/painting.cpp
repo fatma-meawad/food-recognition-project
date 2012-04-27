@@ -18,6 +18,7 @@ IplImage* Painting::drawRect(IplImage * img, CvRect rect){
     return img;
 }
 
+// Draw alla features
 IplImage* Painting::drawFullFace(IplImage * img, Facefeatures * ff)
 {
     drawRect(img, ff->mFace);
@@ -25,4 +26,12 @@ IplImage* Painting::drawFullFace(IplImage * img, Facefeatures * ff)
     drawHairCross(img, ff->center(ff->mRightEye));
 
     return img;
+}
+
+// Graphs
+void Painting::drawGraph(std::list<Data> ls)
+{
+    for (list<Data>::iterator it = ls.begin(); it != ls.end(); it++){
+        std::cout << it->pulsefreq << std::endl;
+    }
 }

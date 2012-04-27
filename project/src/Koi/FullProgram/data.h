@@ -5,12 +5,13 @@
 
 class Data
 {
-    int pulsefreq;
-    int breathingfreq;
-    int blinkingfreq;
 
 public:
     Data();
+
+    int pulsefreq;
+    int breathingfreq;
+    int blinkingfreq;
 };
 
 #endif // DATA_H

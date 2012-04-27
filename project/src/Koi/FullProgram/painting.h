@@ -4,6 +4,7 @@
 #include "Includes.h"
 
 class Facefeatures;
+class Data;
 
 class Painting
 {
@@ -15,7 +16,7 @@ public:
     static IplImage* drawRect(IplImage*, CvRect);
     static IplImage* drawCircle(IplImage*, CvPoint);
 
-    static void drawGraph();
+    static void drawGraph(std::list<Data>);
 };
 
 #endif // PAINTING_H
