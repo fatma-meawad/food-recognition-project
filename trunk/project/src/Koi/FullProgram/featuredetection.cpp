@@ -2,10 +2,11 @@
 
 Featuredetection::Featuredetection()
 {
+    this->lock = false;
 }
 
 
-int detectface (IplImage* img, CvRect* face){
+int Featuredetection::detectface (IplImage* img, CvRect* face){
     int i;
     static CvHaarClassifierCascade* cascade = 0;
     static CvMemStorage* storage = 0;
@@ -21,16 +22,33 @@ int detectface (IplImage* img, CvRect* face){
         {
             // Create a new rectangle for drawing the face
             CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
+            if(Preprocessing::Pointdistance(cvPoint(0,0),cvPoint(face->x,face->y)) < 1.0 && !lock)
+            {
+                *face = *r;
+                cvClearMemStorage(storage);
+                this->lock = true;
+                return 1;
+            }
+            if(Preprocessing::Pointdistance(cvPoint(r->x,r->y),cvPoint(face->x,face->y)) > Tolerance + 100 && lock)
+                continue;
+
             *face=*r;
             // Find the dimensions of the face,and scale it if necessary
             cvClearMemStorage( storage );
             return 1;
         }
+
+        this->lock = false;
+
+//          CvRect*r= (CvRect*)cvGetSeqElem( faces, 0 );
+//          *face = *r;
+//          return 1;
+
     }
     return -1;
 }
 
-int detectEye (IplImage* img,CvPoint roi, CvRect* eyes){
+int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes){
     int i;
     static CvHaarClassifierCascade* cascade = 0;
     static CvMemStorage* storage = 0;
@@ -64,6 +82,7 @@ Facefeatures Featuredetection::detectfeatures(IplImage* img){
     CvPoint A;
     if(-1==detectface(img,&head.mFace)){
         fprintf( stderr, "Could not locate head" );
+        return head;
     }else{
         cvSetImageROI(img,cvRect(head.mFace.x,head.mFace.y,head.mFace.width/2,head.mFace.height/2));
         A.x=head.mFace.x;
@@ -81,7 +100,7 @@ Facefeatures Featuredetection::detectfeatures(IplImage* img){
         cvRectangleR( img, head.mLeftEye, CV_RGB(0,255,0), 3, 8, 0 );
         cvRectangleR( img, head.mRightEye, CV_RGB(0,0,255), 3, 8, 0 );
     }
-    cvShowImage("result", img);
+    //cvShowImage("result", img);
     return head;
 
 }

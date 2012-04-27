@@ -3,8 +3,6 @@
 
 #include "Includes.h"
 
-class Facefeatures;
-
 class Preprocessing
 {
 public:
@@ -13,7 +11,8 @@ public:
     static void MakeGrayscale(IplImage *);
     static IplImage * Crop(CvRect,IplImage*);
 
-    static IplImage * Stabilize(Facefeatures*,IplImage*);
+    static IplImage * Stabilize(IplImage*,Facefeatures *);
+
 };
 
 #endif // PREPROCESSING_H
