@@ -31,7 +31,7 @@ void Preprocessing::MakeGrayscale(IplImage * Image)
     //cvCvtColor(Image,Image,CV_RGB2GRAY);
 }
 
-IplImage * Preprocessing::Stabilize(Facefeatures* Inputfeatures, IplImage * Image)
+IplImage * Preprocessing::Stabilize(IplImage * Image,Facefeatures* Inputfeatures)
 {
 
     if(Pointdistance(this->CurrentP,cvPoint(0,0)) == 0.0 || Pointdistance(cvPoint(Inputfeatures->mFace.x,Inputfeatures->mFace.y),CurrentP) > Tolerance)

@@ -3,15 +3,21 @@
 
 #include "Includes.h"
 
+#define Tolerance 20
+
 class Preprocessing
 {
+    CvPoint CurrentP;
+    CvRect CurrentCrop;
+
 public:
     Preprocessing();
 
     static void MakeGrayscale(IplImage *);
     static IplImage * Crop(CvRect,IplImage*);
 
-    static IplImage * Stabilize(IplImage*,Facefeatures *);
+    IplImage * Stabilize(IplImage*,Facefeatures *);
+    static float Pointdistance(CvPoint p1, CvPoint p2);
 
 };
 
