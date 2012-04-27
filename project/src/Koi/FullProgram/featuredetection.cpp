@@ -6,7 +6,7 @@ Featuredetection::Featuredetection()
 }
 
 
-int Featuredetection::detectface (IplImage* img, CvRect* face){
+int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect old_face){
     int i;
     static CvHaarClassifierCascade* cascade = 0;
     static CvMemStorage* storage = 0;
@@ -22,33 +22,24 @@ int Featuredetection::detectface (IplImage* img, CvRect* face){
         {
             // Create a new rectangle for drawing the face
             CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
-            if(Preprocessing::Pointdistance(cvPoint(0,0),cvPoint(face->x,face->y)) < 1.0 && !lock)
+            //if(Preprocessing::Pointdistance(cvPoint(old_face.x,old_face.y),cvPoint(r->x,r->y)) < 20 || old_face.x==-1 )
+            if((abs(r->x-old_face.x)<50 && abs(r->y-old_face.y)<50 || old_face.x==-1))
             {
+                printf("Hittade ett ansikte innom gränsen\n");
                 *face = *r;
                 cvClearMemStorage(storage);
-                this->lock = true;
+                //this->lock = true;
                 return 1;
             }
-            if(Preprocessing::Pointdistance(cvPoint(r->x,r->y),cvPoint(face->x,face->y)) > Tolerance + 100 && lock)
-                continue;
+            printf("Felaktigt ansikte");
 
-            *face=*r;
-            // Find the dimensions of the face,and scale it if necessary
-            cvClearMemStorage( storage );
-            return 1;
         }
-
-        this->lock = false;
-
-//          CvRect*r= (CvRect*)cvGetSeqElem( faces, 0 );
-//          *face = *r;
-//          return 1;
 
     }
     return -1;
 }
 
-int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes){
+int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes, Facefeatures old_face){
     int i;
     static CvHaarClassifierCascade* cascade = 0;
     static CvMemStorage* storage = 0;
@@ -77,30 +68,31 @@ int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes){
 }
 
 
-Facefeatures Featuredetection::detectfeatures(IplImage* img){
+Facefeatures Featuredetection::detectfeatures(IplImage* img, Facefeatures old_face){
     Facefeatures head;
     CvPoint A;
-    if(-1==detectface(img,&head.mFace)){
-        fprintf( stderr, "Could not locate head" );
+    if(-1==detectface(img,&head.mFace,old_face.mFace)){
+        fprintf( stderr, "Could not locate head\n" );
         return head;
     }else{
-        cvSetImageROI(img,cvRect(head.mFace.x,head.mFace.y,head.mFace.width/2,head.mFace.height/2));
+        cvSetImageROI(img,cvRect(head.mFace.x,head.mFace.y,head.mFace.width/2,head.mFace.height*3/5));
         A.x=head.mFace.x;
         A.y=head.mFace.y;
-        detectEye(img,A,&head.mLeftEye);
+        detectEye(img,A,&head.mLeftEye,old_face);
         cvResetImageROI(img);
-        cvSetImageROI(img,cvRect(head.mFace.x+head.mFace.width/2,head.mFace.y,head.mFace.width/2,head.mFace.height/2));
+        cvSetImageROI(img,cvRect(head.mFace.x+head.mFace.width/2,head.mFace.y,head.mFace.width/2,head.mFace.height*3/5));
         A.x=head.mFace.x+head.mFace.width/2;
         A.y=head.mFace.y;
-        detectEye(img,A,&head.mRightEye);
+        detectEye(img,A,&head.mRightEye,old_face);
         cvResetImageROI(img);
 
 
         cvRectangleR( img, head.mFace, CV_RGB(255,0,0), 3, 8, 0 );
         cvRectangleR( img, head.mLeftEye, CV_RGB(0,255,0), 3, 8, 0 );
         cvRectangleR( img, head.mRightEye, CV_RGB(0,0,255), 3, 8, 0 );
+        cvShowImage("result", img);
     }
-    //cvShowImage("result", img);
+
     return head;
 
 }
