@@ -25,13 +25,13 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect old_face){
                 // Create a new rectangle for drawing the face
                 CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
                 cvSetImageROI(img,cvRect(r->x,r->y,r->width,r->height*3/5));
-                CvSeq* eyes = cvHaarDetectObjects( img, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
-                //if (0<(eyes ? eyes->total : 0)){
+                CvSeq* eyes = cvHaarDetectObjects( img, cascade_eye, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
+                if (1<(eyes ? eyes->total : 0)){
                     printf("Hittade ett ansikte innom gränsen\n");
                     *face = *r;
                     cvClearMemStorage(storage);
                     return 1;
-                //}
+                }
             }
             return -1;
         }else{
