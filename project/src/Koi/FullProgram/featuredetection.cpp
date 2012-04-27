@@ -95,12 +95,16 @@ Facefeatures Featuredetection::detectfeatures(IplImage* img, Facefeatures old_fa
         cvSetImageROI(img,cvRect(head.mFace.x,head.mFace.y,head.mFace.width/2,head.mFace.height*3/5));
         A.x=head.mFace.x;
         A.y=head.mFace.y;
-        detectEye(img,A,&head.mLeftEye,old_face);
+        if (detectEye(img,A,&head.mLeftEye,old_face)==-1){
+            head.mLeftEye=old_face.mLeftEye;
+        }
         cvResetImageROI(img);
         cvSetImageROI(img,cvRect(head.mFace.x+head.mFace.width/2,head.mFace.y,head.mFace.width/2,head.mFace.height*3/5));
         A.x=head.mFace.x+head.mFace.width/2;
         A.y=head.mFace.y;
-        detectEye(img,A,&head.mRightEye,old_face);
+        if (detectEye(img,A,&head.mRightEye,old_face)==-1){
+            head.mRightEye=old_face.mRightEye;
+        }
         cvResetImageROI(img);
 
 
