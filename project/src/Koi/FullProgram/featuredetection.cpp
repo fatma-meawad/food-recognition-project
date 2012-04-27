@@ -17,22 +17,39 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect old_face){
         fprintf( stderr, "ERROR: Could not load classifier cascade\n" );
     }else{
         CvSeq* faces = cvHaarDetectObjects( img, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
-
-        for( i = 0; i < (faces ? faces->total : 0); i++ )
-        {
-            // Create a new rectangle for drawing the face
-            CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
-            //if(Preprocessing::Pointdistance(cvPoint(old_face.x,old_face.y),cvPoint(r->x,r->y)) < 20 || old_face.x==-1 )
-            if((abs(r->x-old_face.x)<50 && abs(r->y-old_face.y)<50 || old_face.x==-1))
+        if (old_face.x==-1){
+            static CvHaarClassifierCascade* cascade_eye = 0;
+            cascade_eye = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
+            for( i = 0; i < (faces ? faces->total : 0); i++ )
             {
-                printf("Hittade ett ansikte innom gränsen\n");
-                *face = *r;
-                cvClearMemStorage(storage);
-                //this->lock = true;
-                return 1;
+                // Create a new rectangle for drawing the face
+                CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
+                cvSetImageROI(img,cvRect(r->x,r->y,r->width,r->height*3/5));
+                CvSeq* eyes = cvHaarDetectObjects( img, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
+                //if (0<(eyes ? eyes->total : 0)){
+                    printf("Hittade ett ansikte innom gränsen\n");
+                    *face = *r;
+                    cvClearMemStorage(storage);
+                    return 1;
+                //}
             }
-            printf("Felaktigt ansikte");
+            return -1;
+        }else{
+            for( i = 0; i < (faces ? faces->total : 0); i++ )
+            {
+                // Create a new rectangle for drawing the face
+                CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
+                //if(Preprocessing::Pointdistance(cvPoint(old_face.x,old_face.y),cvPoint(r->x,r->y)) < 20 || old_face.x==-1 )
+                if((abs(r->x-old_face.x)<50 && abs(r->y-old_face.y)<50 ))
+                {
+                    printf("Hittade ett ansikte innom gränsen\n");
+                    *face = *r;
+                    cvClearMemStorage(storage);
+                    return 1;
+                }
+                printf("Felaktigt ansikte");
 
+            }
         }
 
     }
