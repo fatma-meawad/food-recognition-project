@@ -12,6 +12,9 @@ IplImage * Preprocessing::Crop(CvRect Size, IplImage * Image)
     IplImage * CroppedImage;
     CvRect orgsize = cvRect(0,0,Image->width,Image->height); //save original size
 
+    if(Size.height < 0 || Size.width < 0 || Size.x < 0 || Size.y < 0)
+        return Image;
+
     cvSetImageROI(Image,Size);
 
     CroppedImage = cvCreateImage(cvSize(Image->roi->width,Image->roi->height),Image->depth,Image->nChannels); //create return image

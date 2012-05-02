@@ -3,6 +3,7 @@
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 #include <opencv2/imgproc/imgproc_c.h>
+#include <opencv2/video/video.hpp>
 #include <math.h>
 
 
@@ -57,13 +58,14 @@ int main(int argc, char *argv[])
 {
     IplImage * InputImage = 0;
     IplImage * OpImage = 0;
+    CvCapture * Capture;
     CvScalar Pixel;
 
 
-    if(argc > 1)
-    {
-            InputImage = cvLoadImage( argv[1] , CV_LOAD_IMAGE_COLOR);
-    }
+//    if(argc > 1)
+//    {
+//            InputImage = cvLoadImage( argv[1] , CV_LOAD_IMAGE_COLOR);
+//    }
 
     cout << "File Loaded";
 
@@ -77,6 +79,10 @@ int main(int argc, char *argv[])
     cvCreateTrackbar("Max Green","Color filter",&smoothlevel,255, Maxgreen_callback);
     cvCreateTrackbar("Max Blue","Color filter",&smoothlevel,255, Maxblue_callback);
 
+    Capture = cvCaptureFromCAM(-1);
+
+    InputImage = cvQueryFrame(Capture);
+
     OpImage = cvCreateImage(cvSize(InputImage->width,InputImage->height),InputImage->depth,InputImage->nChannels);
 
 
@@ -84,6 +90,7 @@ int main(int argc, char *argv[])
 
     while(1)
     {
+        InputImage = cvQueryFrame(Capture);
         cvCopyImage(InputImage,OpImage);
 
         for(int i = 0; i < OpImage->width; i++)
