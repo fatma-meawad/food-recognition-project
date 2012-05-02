@@ -51,4 +51,6 @@ int main(int argc, char *argv[])
                 break;
     }
 
+    cvDestroyWindow("asd");
+
 }
