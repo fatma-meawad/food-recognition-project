@@ -17,6 +17,9 @@ public:
     static IplImage* drawCircle(IplImage*, CvPoint);
 
     static void drawGraph(std::list<Data>);
+
+ private:
+    static void init(void);
 };
 
 #endif // PAINTING_H
