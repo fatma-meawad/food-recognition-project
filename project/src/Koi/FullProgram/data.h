@@ -9,6 +9,8 @@ class Data
 public:
     Data();
 
+    double timeStamp;
+
     int pulsefreq;
     int breathingfreq;
     int blinkingfreq;

@@ -1,5 +1,7 @@
 #include "painting.h"
 
+#define WindowName "Graph"
+
 Painting::Painting()
 {
 }
@@ -28,10 +30,48 @@ IplImage* Painting::drawFullFace(IplImage * img, Facefeatures * ff)
     return img;
 }
 
+// Draw circle from point
+IplImage* Painting::drawCircle(IplImage * img, CvPoint p)
+{
+    cvCircle(img,p, 2,cvScalar(0,0,255),-1);
+
+    return img;
+}
+
+// Window init
+void Painting::init(void)
+{
+    namedWindow(WindowName);
+    cvMoveWindow(WindowName, 50, 50);
+    CvMat image = cvMat(500, 500, CV_8SC3);
+    //image = cvScalar(255,255,255);
+
+    cvResizeWindow(WindowName, 500, 500);
+
+    //cv::setMouseCallback("Graph", mouse);
+}
+
 // Graphs
 void Painting::drawGraph(std::list<Data> ls)
 {
+    //init();
+
+    // Create a window
+    namedWindow(WindowName);
+    cvMoveWindow(WindowName, 50, 50);
+    IplImage* image = cvCreateImage(cvSize(500,500),IPL_DEPTH_8U,3);
+    cvZero( image );
+    cvRectangleR(image,cvRect(0,0,500,500),cvScalar(255,255,255), -1);
+    cvResizeWindow(WindowName, 500, 500);
+
+
+    // Iterate list
     for (list<Data>::iterator it = ls.begin(); it != ls.end(); it++){
         std::cout << it->pulsefreq << std::endl;
+        drawCircle(image, cvPoint(it->timeStamp * 50 + 250, 250 - it->pulsefreq * 10));
     }
+
+    cvShowImage(WindowName, image);
 }
+
+
