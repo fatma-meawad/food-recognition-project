@@ -1,4 +1,5 @@
 #include "painting.h"
+#include "boost/utility.hpp"
 
 #define WindowName "Graph"
 
@@ -33,7 +34,7 @@ IplImage* Painting::drawFullFace(IplImage * img, Facefeatures * ff)
 // Draw circle from point
 IplImage* Painting::drawCircle(IplImage * img, CvPoint p)
 {
-    cvCircle(img,p, 2,cvScalar(0,0,255),-1);
+    cvCircle(img,p, 3,cvScalar(0,0,255),1);
 
     return img;
 }
@@ -66,9 +67,13 @@ void Painting::drawGraph(std::list<Data> ls)
 
 
     // Iterate list
-    for (list<Data>::iterator it = ls.begin(); it != ls.end(); it++){
+    list<Data>::iterator it = ls.begin();
+    drawCircle(image, cvPoint(it->timeStamp * 50 + 250, 250 - it->pulsefreq * 10));
+
+    for (it++; it != ls.end(); it++){
         std::cout << it->pulsefreq << std::endl;
         drawCircle(image, cvPoint(it->timeStamp * 50 + 250, 250 - it->pulsefreq * 10));
+        cvLine(image, cvPoint(it->timeStamp * 50 + 250, 250 - it->pulsefreq * 10), cvPoint(boost::prior(it)->timeStamp * 50 + 250, 250 - boost::prior(it)->pulsefreq * 10), cvScalar(0,0,255));
     }
 
     cvShowImage(WindowName, image);
