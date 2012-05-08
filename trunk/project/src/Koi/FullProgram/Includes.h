@@ -12,6 +12,10 @@
 #include <queue>
 #include <list>
 #include <math.h>
+#include <ctime>
+#include <unistd.h>
+#include <sys/time.h>
+
 
 #include "blinking.h"
 #include "breathing.h"

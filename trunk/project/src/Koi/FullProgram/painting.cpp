@@ -52,7 +52,7 @@ void Painting::update(int x, int y)
         mSelect--;
         drawGraph();
     }
-    else if(x>400 && y<100 && mSelect<mData.size()-1){
+    else if(x>400 && y<100 && (unsigned)mSelect<mData.size()-1){
         mSelect++;
         drawGraph();
     }
