@@ -1,8 +1,5 @@
 #include "Includes.h"
 
-
-
-
 int main(int argc, char *argv[])
 {
     Videocapture VC;
@@ -16,6 +13,8 @@ int main(int argc, char *argv[])
 
     Painting paint;
     Data d1;
+
+    timeval start, stop;
 
 
     for(int i = 0; i < 10; i++){
@@ -36,22 +35,25 @@ int main(int argc, char *argv[])
 
     while(true)
     {
+        gettimeofday(&start, NULL);
+
         VC.UpdateFrame();
-       // Preprocessing::MakeGrayscale(VC.CurrentFrame);
+        // Preprocessing::MakeGrayscale(VC.CurrentFrame);
 
-       face = f.detectfeatures(VC.CurrentFrame,old_face);
-       old_face=face;
+        face = f.detectfeatures(VC.CurrentFrame,old_face);
+        old_face=face;
 
-       Painting::drawFullFace(VC.CurrentFrame,&face);  // Paint test
+        paint.drawFullFace(VC.CurrentFrame,&face);  // Paint test
 
-      // cvDrawRect(VC.CurrentFrame,cvPoint(face.mFace.x,face.mFace.y),cvPoint(face.mFace.x + face.mFace.width,face.mFace.y + face.mFace.height),cvScalar(0x00,0x00,0x00),1,8,0);
+        temp = p.Stabilize(VC.CurrentFrame, &face);
 
-        //temp = p.Stabilize(VC.CurrentFrame, &face);
-
-        cvShowImage("asd",VC.CurrentFrame);
+        cvShowImage("asd",temp);
 
         if(cvWaitKey(5) == 27)
-                break;
+            break;
+
+        gettimeofday(&stop, NULL);
+        cout << "FPS: " << 1000/(((stop.tv_sec - start.tv_sec)* 1000 + (stop.tv_usec - start.tv_usec)/1000.0) + 0.5) << endl;
     }
 
     cvDestroyWindow("asd");
