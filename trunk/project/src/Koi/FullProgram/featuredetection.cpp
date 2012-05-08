@@ -26,7 +26,7 @@ CvSeq* Compensate(CvSeq * sequence, int x ,int y)
         r = (CvRect*)cvGetSeqElem( sequence, i );
         r->x += (x - (ROITolerance/2));
         r->y += (y - (ROITolerance/2));
-        cvSeqPush(ReturnSequence,r);
+        //cvSeqPush(ReturnSequence,r);
     }
 
     return ReturnSequence;
@@ -50,9 +50,8 @@ REDO:
 
         temp = Preprocessing::Crop(Size,img);
 
-        faces = cvHaarDetectObjects( temp, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); //om föregående ansikte är användbart börja med att genomsök föregående ansikte + en thershold
+        faces = cvHaarDetectObjects( temp, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); //om föregående ansikte är användbart börja med att genomsök föregående ansikte + en thersh
         faces = Compensate(faces,old_face.x,old_face.y);  //kompensera för beskärningen.
-
         if(faces->total == 0)
         {
 
@@ -71,6 +70,7 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect old_face){
     int i;
     static CvHaarClassifierCascade* cascade = 0;
     static CvMemStorage* storage = 0;
+    static CvMemStorage* storage2 = 0;
     CvSeq* faces;
 
     storage = cvCreateMemStorage(0);
@@ -85,26 +85,29 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect old_face){
         if (old_face.x==-1){
 
 
-            // static CvHaarClassifierCascade* cascade_eye = 0;
-           // cascade_eye = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
+            static CvHaarClassifierCascade* cascade_eye = 0;
+            cascade_eye = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
 
 
             for( i = 0; i < (faces ? faces->total : 0); i++ )
             {
-                // Create a new rectangle for drawing the face
+
                 CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
 
 
 
-               // cvSetImageROI(img,cvRect(r->x,r->y,r->width,r->height*3/5));
-               // CvSeq* eyes = cvHaarDetectObjects( img, cascade_eye, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
-               // if (1<(eyes ? eyes->total : 0)){
+                cvSetImageROI(img,cvRect(r->x,r->y,r->width,r->height*3/5));
+                storage2 = cvCreateMemStorage(0);
+                CvSeq* eyes = cvHaarDetectObjects( img, cascade_eye, storage2,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
+                cvResetImageROI(img);
+                if (1<eyes->total){
 
 
 
                     printf("Hittade ett ansikte innom gränsen\n");
                     *face = *r;
                     cvClearMemStorage(storage); // ##### Varför kastade du ansiktet om du inte hittade ögon?
+                    cvClearMemStorage(storage2);
                     return 1;
 
 
@@ -112,21 +115,22 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect old_face){
 
 
 
-                    // }
+                }
             }
-            return -1;
         }else{
             for( i = 0; i < (faces ? faces->total : 0); i++ )
             {
                 // Create a new rectangle for drawing the face
                 CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
                 //if(Preprocessing::Pointdistance(cvPoint(old_face.x,old_face.y),cvPoint(r->x,r->y)) < 20 || old_face.x==-1 )
-                if((abs(r->x-old_face.x)<50 && abs(r->y-old_face.y)<50 ))
+                if(abs(r->x-old_face.x)<50 && abs(r->y-old_face.y)<50)
                 {
-                    printf("Hittade ett ansikte innom gränsen\n");
-                    *face = *r;
-                    cvClearMemStorage(storage);
-                    return 1;
+                    if(abs(r->width-old_face.width)<50 && abs(r->height-old_face.height)<50 ){
+                        printf("Hittade ett ansikte innom gränsen\n");
+                        *face = *r;
+                        cvClearMemStorage(storage);
+                        return 1;
+                    }
                 }
                 printf("Felaktigt ansikte");
 
@@ -139,7 +143,7 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect old_face){
 
 int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes, Facefeatures old_face){
     int i;
-     CvSeq* faces;
+    CvSeq* faces;
     static CvHaarClassifierCascade* cascade = 0;
     static CvMemStorage* storage = 0;
     storage = cvCreateMemStorage(0);
@@ -161,7 +165,7 @@ int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes, Facefe
 
         }
 
-      //  CvSeq* faces = cvHaarDetectObjects( img, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
+        //  CvSeq* faces = cvHaarDetectObjects( img, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
 
         for( i = 0; i < (faces ? faces->total : 0); i++ )
         {
@@ -183,12 +187,17 @@ int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes, Facefe
 Facefeatures Featuredetection::detectfeatures(IplImage* img, Facefeatures old_face){
     Facefeatures head;
     CvPoint A;
-    if(-1==detectface(img,&head.mFace,old_face.mFace)){
+    if(0>detectface(img,&head.mFace,old_face.mFace)){                   // mindre än noll för fel medelanden istället för -1
         fprintf( stderr, "Could not locate head\n" );
-        head.mFace.x = -1;
+        //head.mFace.x = -1;
+        head=old_face;                                                  // om inget huvud hittas antar vi att det är på samma ställe som förra gången.
         return head;
     }else{
+        //cvShowImage("result", img);
+
+        printf("Huvudets övre högra punkt är i X: %i och i Y: %i , Bredden: %i  och höjden  %i\n",head.mFace.x,head.mFace.y,head.mFace.width,head.mFace.height);
         cvSetImageROI(img,cvRect(head.mFace.x,head.mFace.y,head.mFace.width/2,head.mFace.height*3/5));
+        cvShowImage("result", img);
         A.x=head.mFace.x;
         A.y=head.mFace.y;
         if (detectEye(img,A,&head.mLeftEye,old_face)==-1){
@@ -207,7 +216,7 @@ Facefeatures Featuredetection::detectfeatures(IplImage* img, Facefeatures old_fa
         cvRectangleR( img, head.mFace, CV_RGB(255,0,0), 3, 8, 0 );
         cvRectangleR( img, head.mLeftEye, CV_RGB(0,255,0), 3, 8, 0 );
         cvRectangleR( img, head.mRightEye, CV_RGB(0,0,255), 3, 8, 0 );
-        cvShowImage("result", img);
+        //cvShowImage("result", img);
     }
 
     cvShowImage("result", img);
