@@ -13,7 +13,7 @@ class Preprocessing
 public:
     Preprocessing();
 
-    static void MakeGrayscale(IplImage *);
+    static IplImage * MakeGrayscale(IplImage *);
     static IplImage * Crop(CvRect,IplImage*);
 
     IplImage * Stabilize(IplImage*,Facefeatures *);

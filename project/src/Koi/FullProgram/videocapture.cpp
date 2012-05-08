@@ -38,6 +38,12 @@ int Videocapture::Init(int camMode)
 
 IplImage * Videocapture::GetFrame()
 {
+    if(!this->capture)
+    {
+        std::cout << "Capture = null";
+        return NULL;
+    }
+
     IplImage * returnimage = cvQueryFrame(this->capture);
     return returnimage;
 }
@@ -52,5 +58,21 @@ int Videocapture::UpdateFrame()
         std::cout << "cant get frame";
         return -2;
     }
+    this->AVI = false;
+    return 1;
+}
+
+int Videocapture::InitAVI(char * filename)
+{
+    this->capture = cvCaptureFromAVI(filename);
+
+    if(!this->capture)
+         {
+        std::cout << "Error: Avi capture == null";
+        return -1;
+    }
+
+    this->AVI = true;
+    this->fps = ( int )cvGetCaptureProperty( this->capture, CV_CAP_PROP_FPS );
     return 1;
 }
