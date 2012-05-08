@@ -14,7 +14,7 @@ public:
     static IplImage* drawFullFace(IplImage*, Facefeatures*);
     static IplImage* drawHairCross(IplImage*, CvPoint);
     static IplImage* drawRect(IplImage*, CvRect);
-    static IplImage* drawCircle(IplImage*, CvPoint);
+    static IplImage* drawCircle(IplImage*, CvPoint, int);
 
     static void drawGraph(std::list<Data>);
 

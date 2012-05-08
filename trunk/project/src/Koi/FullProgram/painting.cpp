@@ -32,9 +32,14 @@ IplImage* Painting::drawFullFace(IplImage * img, Facefeatures * ff)
 }
 
 // Draw circle from point
-IplImage* Painting::drawCircle(IplImage * img, CvPoint p)
+IplImage* Painting::drawCircle(IplImage * img, CvPoint p, int c)
 {
+    if(c == 0)
     cvCircle(img,p, 3,cvScalar(0,0,255),1);
+    else if(c == 1)
+        cvCircle(img,p, 3,cvScalar(0,255,0),1);
+    else
+       cvCircle(img,p, 3,cvScalar(255,0,0),1);
 
     return img;
 }
@@ -66,14 +71,28 @@ void Painting::drawGraph(std::list<Data> ls)
     cvResizeWindow(WindowName, 500, 500);
 
 
-    // Iterate list
+    // Iterate list and draw lines and stuff
+    int offSet = 250;
+    int xScale = 200;
+    int yScale = 20;
     list<Data>::iterator it = ls.begin();
-    drawCircle(image, cvPoint(it->timeStamp * 50 + 250, 250 - it->pulsefreq * 10));
+    drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->pulsefreq * yScale),0);
+    drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->blinkingfreq * yScale),1);
+    drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->breathingfreq * yScale),2);
 
     for (it++; it != ls.end(); it++){
-        std::cout << it->pulsefreq << std::endl;
-        drawCircle(image, cvPoint(it->timeStamp * 50 + 250, 250 - it->pulsefreq * 10));
-        cvLine(image, cvPoint(it->timeStamp * 50 + 250, 250 - it->pulsefreq * 10), cvPoint(boost::prior(it)->timeStamp * 50 + 250, 250 - boost::prior(it)->pulsefreq * 10), cvScalar(0,0,255));
+        drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->pulsefreq * yScale),0);
+        cvLine(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->pulsefreq * yScale),
+        cvPoint(boost::prior(it)->timeStamp * xScale + offSet,offSet - boost::prior(it)->pulsefreq * yScale), cvScalar(0,0,255));
+
+        drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->blinkingfreq * yScale),1);
+        cvLine(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->blinkingfreq * yScale),
+        cvPoint(boost::prior(it)->timeStamp * xScale + offSet,offSet - boost::prior(it)->blinkingfreq * yScale), cvScalar(0,255,0));
+
+        drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->breathingfreq * yScale),2);
+        cvLine(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->breathingfreq * yScale),
+        cvPoint(boost::prior(it)->timeStamp * xScale + offSet,offSet - boost::prior(it)->breathingfreq * yScale), cvScalar(255,0,0));
+
     }
 
     cvShowImage(WindowName, image);
