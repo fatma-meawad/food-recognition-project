@@ -29,7 +29,7 @@ IplImage * Preprocessing::Crop(CvRect Size, IplImage * Image)
 }
 
 
-void Preprocessing::MakeGrayscale(IplImage * Image)
+IplImage * Preprocessing::MakeGrayscale(IplImage * Image)
 {
     //cvCvtColor(Image,Image,CV_RGB2GRAY);
 }
