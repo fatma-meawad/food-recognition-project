@@ -14,12 +14,21 @@ public:
     static IplImage* drawFullFace(IplImage*, Facefeatures*);
     static IplImage* drawHairCross(IplImage*, CvPoint);
     static IplImage* drawRect(IplImage*, CvRect);
-    static IplImage* drawCircle(IplImage*, CvPoint, int);
+    static IplImage* drawCircle(IplImage*, CvPoint, int, int);
 
-    static void drawGraph(std::list<Data>);
+    void drawGraph();
 
- private:
-    static void init(void);
+    void update(int x, int y);
+
+    int mSelect;
+    IplImage* mImage;
+
+    std::vector<Data> mData;
+
+    cv::Rect mLeftButton;
+    cv::Rect mRightButton;
+
+    void drawInit(Painting*);
 };
 
 #endif // PAINTING_H

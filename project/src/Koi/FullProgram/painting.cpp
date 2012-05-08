@@ -3,6 +3,8 @@
 
 #define WindowName "Graph"
 
+Painting* paint;
+
 Painting::Painting()
 {
 }
@@ -32,70 +34,117 @@ IplImage* Painting::drawFullFace(IplImage * img, Facefeatures * ff)
 }
 
 // Draw circle from point
-IplImage* Painting::drawCircle(IplImage * img, CvPoint p, int c)
+IplImage* Painting::drawCircle(IplImage * img, CvPoint p, int c, int t)
 {
     if(c == 0)
-    cvCircle(img,p, 3,cvScalar(0,0,255),1);
+        cvCircle(img,p, 3,cvScalar(0,0,255),t);
     else if(c == 1)
-        cvCircle(img,p, 3,cvScalar(0,255,0),1);
+        cvCircle(img,p, 3,cvScalar(0,255,0),t);
     else
-       cvCircle(img,p, 3,cvScalar(255,0,0),1);
+        cvCircle(img,p, 3,cvScalar(255,0,0),t);
 
     return img;
 }
 
-// Window init
-void Painting::init(void)
+void Painting::update(int x, int y)
 {
-    namedWindow(WindowName);
-    cvMoveWindow(WindowName, 50, 50);
-    CvMat image = cvMat(500, 500, CV_8SC3);
-    //image = cvScalar(255,255,255);
-
-    cvResizeWindow(WindowName, 500, 500);
-
-    //cv::setMouseCallback("Graph", mouse);
+    if(x<100 && y<100 && mSelect>0){
+        mSelect--;
+        drawGraph();
+    }
+    else if(x>400 && y<100 && mSelect<mData.size()-1){
+        mSelect++;
+        drawGraph();
+    }
 }
 
-// Graphs
-void Painting::drawGraph(std::list<Data> ls)
+// Mouse callback to capture button clicks and similar
+void mouse( int event, int x, int y, int flags, void* param )
 {
-    //init();
+
+    switch( event ){
+
+    case CV_EVENT_LBUTTONDOWN:
+        paint->update(x,y);
+        break;
+    }
+}
+
+// Initialize window and variables
+void Painting::drawInit(Painting* p)
+{
+    paint = p;
 
     // Create a window
     namedWindow(WindowName);
+    cvSetMouseCallback(WindowName, mouse, NULL);
     cvMoveWindow(WindowName, 50, 50);
     IplImage* image = cvCreateImage(cvSize(500,500),IPL_DEPTH_8U,3);
     cvZero( image );
     cvRectangleR(image,cvRect(0,0,500,500),cvScalar(255,255,255), -1);
     cvResizeWindow(WindowName, 500, 500);
 
+    mImage = image;
+    mSelect = 0;
 
-    // Iterate list and draw lines and stuff
-    int offSet = 250;
-    int xScale = 200;
-    int yScale = 20;
-    list<Data>::iterator it = ls.begin();
-    drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->pulsefreq * yScale),0);
-    drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->blinkingfreq * yScale),1);
-    drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->breathingfreq * yScale),2);
+    mLeftButton = cvRect(10, 10, 100, 100);
+    mRightButton = cvRect(490, 10, 100, 100);
+}
 
-    for (it++; it != ls.end(); it++){
-        drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->pulsefreq * yScale),0);
-        cvLine(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->pulsefreq * yScale),
-        cvPoint(boost::prior(it)->timeStamp * xScale + offSet,offSet - boost::prior(it)->pulsefreq * yScale), cvScalar(0,0,255));
+// Graphs 2
+void Painting::drawGraph()
+{
+    cvZero(mImage);
+    cvRectangleR(mImage,cvRect(0,0,500,500),cvScalar(255,255,255), -1);
 
-        drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->blinkingfreq * yScale),1);
-        cvLine(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->blinkingfreq * yScale),
-        cvPoint(boost::prior(it)->timeStamp * xScale + offSet,offSet - boost::prior(it)->blinkingfreq * yScale), cvScalar(0,255,0));
+    CvFont font;
+    double hScale=0.5;
+    double vScale=0.5;
+    int    lineWidth=1;
+    cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX|CV_FONT_ITALIC, hScale,vScale,0,lineWidth);
 
-        drawCircle(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->breathingfreq * yScale),2);
-        cvLine(image, cvPoint(it->timeStamp * xScale + offSet, offSet - it->breathingfreq * yScale),
-        cvPoint(boost::prior(it)->timeStamp * xScale + offSet,offSet - boost::prior(it)->breathingfreq * yScale), cvScalar(255,0,0));
+    cvPutText (mImage,"Left",cvPoint(20,50), &font, cvScalar(200,0,0));
+    cvPutText (mImage,"Right",cvPoint(420,50), &font, cvScalar(0,200,0));
 
+    if(mData.size())
+    {
+        int xScale = 200;
+        int yScale = 20;
+        int xOffSet = 250 - mData[mSelect].timeStamp * xScale;
+        int yOffSet1 = 240 + mData[mSelect].pulsefreq * yScale;
+        int yOffSet2 = 250 + mData[mSelect].blinkingfreq * yScale;
+        int yOffSet3 = 260 + mData[mSelect].breathingfreq * yScale;
+        int t = 1; //thick
+
+        if(mSelect == 0)
+            t = -1;
+
+        drawCircle(mImage,cvPoint(mData[0].timeStamp * xScale + xOffSet,yOffSet1 - mData[0].pulsefreq * yScale),0,t);
+        drawCircle(mImage,cvPoint(mData[0].timeStamp * xScale + xOffSet,yOffSet2 - mData[0].blinkingfreq * yScale),0,t);
+        drawCircle(mImage,cvPoint(mData[0].timeStamp * xScale + xOffSet,yOffSet3 - mData[0].breathingfreq * yScale),0,t);
+
+        for(unsigned int i = 1; i<mData.size(); i++)
+        {
+            int thick = 1;
+            if((unsigned)mSelect == i)
+                thick = -1;
+            // Pulse
+            drawCircle(mImage,cvPoint(mData[i].timeStamp * xScale + xOffSet, yOffSet1 - mData[i].pulsefreq * yScale),0,thick);
+            cvLine(mImage,cvPoint(mData[i].timeStamp * xScale + xOffSet, yOffSet1 - mData[i].pulsefreq * yScale),
+                   cvPoint(mData[i-1].timeStamp * xScale + xOffSet, yOffSet1 - mData[i-1].pulsefreq * yScale),cvScalar(0,0,255));
+            // Blinking
+            drawCircle(mImage,cvPoint(mData[i].timeStamp * xScale + xOffSet, yOffSet2 - mData[i].blinkingfreq * yScale),1,thick);
+            cvLine(mImage,cvPoint(mData[i].timeStamp * xScale + xOffSet, yOffSet2 - mData[i].blinkingfreq * yScale),
+                   cvPoint(mData[i-1].timeStamp * xScale + xOffSet, yOffSet2 - mData[i-1].blinkingfreq * yScale),cvScalar(0,255,0));
+            // Breathing
+            drawCircle(mImage,cvPoint(mData[i].timeStamp * xScale + xOffSet, yOffSet3 - mData[i].breathingfreq * yScale),2,thick);
+            cvLine(mImage,cvPoint(mData[i].timeStamp * xScale + xOffSet, yOffSet3 - mData[i].breathingfreq * yScale),
+                   cvPoint(mData[i-1].timeStamp * xScale + xOffSet, yOffSet3 - mData[i-1].breathingfreq * yScale),cvScalar(255,0,0));
+        }
     }
 
-    cvShowImage(WindowName, image);
+    cvShowImage(WindowName, mImage);
+
 }
 
 

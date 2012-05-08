@@ -14,17 +14,19 @@ int main(int argc, char *argv[])
     Featuredetection f;
     IplImage * temp;
 
-    list<Data> status;      // Test för grafutritning ... :)
+    Painting paint;
     Data d1;
+
 
     for(int i = 0; i < 10; i++){
         d1.timeStamp = (double)i/10; d1.blinkingfreq = i;
         d1.breathingfreq = i+1; d1.pulsefreq = i-1;
 
-        status.push_back(d1);
+        paint.mData.push_back(d1);
     }
 
-    Painting::drawGraph(status);
+    paint.drawInit(&paint);
+    paint.drawGraph();
 
 
 
