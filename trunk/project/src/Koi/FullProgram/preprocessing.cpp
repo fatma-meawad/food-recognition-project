@@ -30,9 +30,12 @@ IplImage * Preprocessing::Crop(CvRect Size, IplImage * Image)
 
 
 IplImage * Preprocessing::MakeGrayscale(IplImage * Image)
-{
-    IplImage * Temp = cvCreateImage(cvSize(Image->width,Image->height),Image->depth,Image->nChannels);
-    cvCvtColor(Image,Temp,CV_BGR2GRAY);
+{    
+    IplImage * Temp = cvCreateImage(cvSize(Image->width,Image->height),IPL_DEPTH_8U,1);
+    cvCvtColor(Image, Temp, CV_RGB2GRAY);
+    //cvNot(Temp, Temp);    // Inverter
+    //cvThreshold(Temp,Temp,150,250,CV_THRESH_BINARY_INV);    // Threshold
+
     return Temp;
 }
 
