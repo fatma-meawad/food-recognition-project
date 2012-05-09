@@ -31,7 +31,9 @@ IplImage * Preprocessing::Crop(CvRect Size, IplImage * Image)
 
 IplImage * Preprocessing::MakeGrayscale(IplImage * Image)
 {
-    //cvCvtColor(Image,Image,CV_RGB2GRAY);
+    IplImage * Temp = cvCreateImage(cvSize(Image->width,Image->height),Image->depth,Image->nChannels);
+    cvCvtColor(Image,Temp,CV_BGR2GRAY);
+    return Temp;
 }
 
 IplImage * Preprocessing::Stabilize(IplImage * Image,Facefeatures* Inputfeatures)
