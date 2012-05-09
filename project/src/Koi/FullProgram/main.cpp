@@ -48,11 +48,11 @@ int main(int argc, char *argv[])
         face = f.detectfeatures(VC.CurrentFrame,old_face);
         old_face=face;
 
-        paint.drawFullFace(VC.CurrentFrame,&face);  // Paint test
-
         temp = p.Stabilize(VC.CurrentFrame, &face);
 
         Blinker.Analyze(VC.CurrentFrame,face.mRightEye,face.mLeftEye);
+
+        paint.drawFullFace(VC.CurrentFrame,&face);  // Paint test
 
         cvShowImage("asd",temp);
 

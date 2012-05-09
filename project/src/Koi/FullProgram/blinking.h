@@ -3,7 +3,7 @@
 
 #include "Includes.h"
 
-#define blinkingthreshold 1000
+#define blinkingthreshold 12
 
 class Blinking
 {
