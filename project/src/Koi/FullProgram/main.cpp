@@ -3,10 +3,12 @@
 int main(int argc, char *argv[])
 {
     Videocapture VC;
+    Facefeatures* pFace;
     Facefeatures face;
     Blinking Blinker;
     Facefeatures old_face;
     old_face.mFace.x=-1;   // säger att old_face inte är användbar;
+    pFace = &face;
 
     Preprocessing p;
     Featuredetection f;
@@ -32,9 +34,7 @@ int main(int argc, char *argv[])
     paint.drawInit(&paint);
     paint.drawGraph();
 
-
-
-    cvNamedWindow("asd",CV_WINDOW_AUTOSIZE);
+    //cvNamedWindow("asd",CV_WINDOW_AUTOSIZE);
 
     //cvWaitKey(0);
 
@@ -43,18 +43,17 @@ int main(int argc, char *argv[])
         gettimeofday(&start, NULL);
 
         VC.UpdateFrame();
-        // Preprocessing::MakeGrayscale(VC.CurrentFrame);
 
-        face = f.detectfeatures(VC.CurrentFrame,old_face);
-        old_face=face;
+        pFace = f.detectfeatures(VC.CurrentFrame,&old_face);
+        old_face=*pFace;
 
-        temp = p.Stabilize(VC.CurrentFrame, &face);
+        //temp = p.Stabilize(VC.CurrentFrame, &old_face);
 
-        Blinker.Analyze(VC.CurrentFrame,face.mRightEye,face.mLeftEye);
+        Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 
-        paint.drawFullFace(VC.CurrentFrame,&face);  // Paint test
+        paint.drawFullFace(VC.CurrentFrame,&old_face);  // Paint test
 
-        cvShowImage("asd",temp);
+        cvShowImage("asd",VC.CurrentFrame);
 
         if(cvWaitKey(5) == 27)
             break;
@@ -63,6 +62,6 @@ int main(int argc, char *argv[])
         cout << "FPS: " << 1000/(((stop.tv_sec - start.tv_sec)* 1000 + (stop.tv_usec - start.tv_usec)/1000.0) + 0.5) << endl;
     }
 
-    cvDestroyWindow("asd");
+    //cvDestroyWindow("asd");
 
 }
