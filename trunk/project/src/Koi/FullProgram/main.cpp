@@ -4,9 +4,10 @@ int main(int argc, char *argv[])
 {
     Videocapture VC;
     Facefeatures face;
+    Blinking Blinker;
     Facefeatures old_face;
     old_face.mFace.x=-1;   // säger att old_face inte är användbar;
-    VC.Init(CV_CAP_ANY);
+
     Preprocessing p;
     Featuredetection f;
     IplImage * temp;
@@ -16,6 +17,10 @@ int main(int argc, char *argv[])
 
     timeval start, stop;
 
+    if(argc == 1)
+        VC.Init(CV_CAP_ANY);
+    else
+        VC.InitAVI(argv[2]);
 
     for(int i = 0; i < 10; i++){
         d1.timeStamp = (double)i/10; d1.blinkingfreq = i;
@@ -46,6 +51,8 @@ int main(int argc, char *argv[])
         paint.drawFullFace(VC.CurrentFrame,&face);  // Paint test
 
         temp = p.Stabilize(VC.CurrentFrame, &face);
+
+        Blinker.Analyze(VC.CurrentFrame,face.mRightEye,face.mLeftEye);
 
         cvShowImage("asd",temp);
 
