@@ -31,8 +31,8 @@ int main(int argc, char *argv[])
         paint.mData.push_back(d1);
     }
 
-    paint.drawInit(&paint);
-    paint.drawGraph();
+    //paint.drawInit(&paint);
+    //paint.drawGraph();
 
     //cvNamedWindow("asd",CV_WINDOW_AUTOSIZE);
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
         pFace = f.detectfeatures(VC.CurrentFrame,&old_face);
         old_face=*pFace;
 
-        //temp = p.Stabilize(VC.CurrentFrame, &old_face);
+        temp = p.Stabilize(VC.CurrentFrame, &old_face);
 
         Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 
