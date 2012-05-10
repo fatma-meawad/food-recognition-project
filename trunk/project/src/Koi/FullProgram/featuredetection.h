@@ -8,14 +8,11 @@ class Facefeatures;
 class Featuredetection
 {
 private:
-    bool lock;
-    int framessincelastpoll;
+
     CvHaarClassifierCascade* cascade;
     CvHaarClassifierCascade* cascade_eye;
     CvMemStorage * storage;
     CvMemStorage * storage2;
-    bool compensate;
-    int x,y;
 
 public:
     Featuredetection();
