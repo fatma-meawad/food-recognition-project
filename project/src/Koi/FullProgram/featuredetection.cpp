@@ -208,9 +208,9 @@ Facefeatures* Featuredetection::detectfeatures(IplImage* img, Facefeatures* old_
         cvResetImageROI(img);
 
 
-        cvRectangleR( img, head.mFace, CV_RGB(255,0,0), 3, 8, 0 );
-        cvRectangleR( img, head.mLeftEye, CV_RGB(0,255,0), 3, 8, 0 );
-        cvRectangleR( img, head.mRightEye, CV_RGB(0,0,255), 3, 8, 0 );
+    //    cvRectangleR( img, head.mFace, CV_RGB(255,0,0), 3, 8, 0 );
+    //    cvRectangleR( img, head.mLeftEye, CV_RGB(0,255,0), 3, 8, 0 );
+    //    cvRectangleR( img, head.mRightEye, CV_RGB(0,0,255), 3, 8, 0 );
         //cvShowImage("result", img);
     }
 
