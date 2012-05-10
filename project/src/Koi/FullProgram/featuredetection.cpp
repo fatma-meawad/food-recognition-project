@@ -5,6 +5,9 @@
 Featuredetection::Featuredetection()
 {
     this->lock = false;
+
+    this->cascade = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_frontalface_alt.xml", 0, 0, 0 );
+    this->cascade_eye = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
 }
 
 CvSeq* GetFeatures(IplImage* img, CvHaarClassifierCascade * cascade, CvMemStorage* storage)
@@ -68,25 +71,19 @@ CONT:
 
 int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* old_face){
     int i;
-    static CvHaarClassifierCascade* cascade = 0;
     static CvMemStorage* storage = 0;
     static CvMemStorage* storage2 = 0;
     CvSeq* faces;
 
     storage = cvCreateMemStorage(0);
-    cascade = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_frontalface_alt.xml", 0, 0, 0 );
-    if( !cascade )
+    if( !this->cascade )
     {
         fprintf( stderr, "ERROR: Could not load classifier cascade\n" );
     }else{
 
-        faces = GetFaces(img,cascade,storage,*old_face); //sköter ansiktssökningen.
+        faces = GetFaces(img,this->cascade,storage,*old_face); //sköter ansiktssökningen.
 
         if (old_face->x==-1){
-
-
-            static CvHaarClassifierCascade* cascade_eye = 0;
-            cascade_eye = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
 
 
             for( i = 0; i < (faces ? faces->total : 0); i++ )
@@ -98,7 +95,7 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* old_face)
 
                 cvSetImageROI(img,cvRect(r->x,r->y,r->width,r->height*3/5));
                 storage2 = cvCreateMemStorage(0);
-                CvSeq* eyes = cvHaarDetectObjects( img, cascade_eye, storage2,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
+                CvSeq* eyes = cvHaarDetectObjects( img, this->cascade_eye, storage2,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
                 cvResetImageROI(img);
                 if (1<eyes->total){
 
@@ -144,11 +141,9 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* old_face)
 int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes, Facefeatures* old_face){
     int i;
     CvSeq* faces;
-    static CvHaarClassifierCascade* cascade = 0;
     static CvMemStorage* storage = 0;
     storage = cvCreateMemStorage(0);
-    cascade = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
-    if( !cascade )
+    if( !this->cascade_eye )
     {
         fprintf( stderr, "ERROR: Could not load classifier cascade\n" );
     }else{
@@ -156,7 +151,7 @@ int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes, Facefe
 
         try
         {
-            faces = cvHaarDetectObjects( img, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); //blev konstigt ibland så fick prova en try cath sats för att ta reda på felet.
+            faces = cvHaarDetectObjects( img, this->cascade_eye, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); //blev konstigt ibland så fick prova en try cath sats för att ta reda på felet.
         }
         catch(exception e)
         {

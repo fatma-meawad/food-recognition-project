@@ -9,6 +9,8 @@ class Featuredetection
 {
 private:
     bool lock;
+    CvHaarClassifierCascade* cascade;
+    CvHaarClassifierCascade* cascade_eye;
 
 public:
     Featuredetection();
