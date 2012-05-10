@@ -44,9 +44,9 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
     {
         REImage = righteye;
 
-        REImage.y += upperresize;
-        REImage.height -= upperresize;
-        LEImage.height -= lowerresize;
+        REImage.y += Findupperresize(REImage);
+        REImage.height -= Findupperresize(REImage);
+        LEImage.height -= Findlowerresize(REImage);
 
         LowerRE = CalcPixels(Preprocessing::Crop(REImage,inputimage));  //calculate the lower grayscale pixels, the eye for the right;
 
@@ -63,9 +63,9 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
         LEImage = lefteye;
 
 
-        LEImage.y += upperresize;
-        LEImage.height -= upperresize;
-        LEImage.height -= lowerresize;
+        LEImage.y += Findupperresize(LEImage);
+        LEImage.height -= Findupperresize(LEImage);
+        LEImage.height -= Findlowerresize(LEImage);
 
         LowerLE = CalcPixels(Preprocessing::Crop(LEImage,inputimage));
        // std::cout << "LOW: " << LowerLE << endl;
@@ -96,5 +96,17 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
    // LeftEye = Preprocessing::Crop(LEImage,inputimage);
 
 }
+
+int Blinking::Findlowerresize(CvRect eye)
+{
+    return eye.height / 4;
+}
+
+int Blinking::Findupperresize(CvRect eye)
+{
+    return eye.height / 5;
+}
+
+
 
 

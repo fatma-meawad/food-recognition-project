@@ -45,16 +45,18 @@ int main(int argc, char *argv[])
         VC.UpdateFrame();
 
         pFace = f.detectfeatures(VC.CurrentFrame,&old_face);
-        old_face=*pFace;
+        if(pFace->mFace.x != -1)
+        {
+            old_face=*pFace;
 
-        temp = p.Stabilize(VC.CurrentFrame, &old_face);
+            temp = p.Stabilize(VC.CurrentFrame, &old_face);
 
-        Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
+            Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 
-        paint.drawFullFace(VC.CurrentFrame,&old_face);  // Paint test
+            paint.drawFullFace(VC.CurrentFrame,&old_face);  // Paint test
 
-        cvShowImage("asd",VC.CurrentFrame);
-
+            cvShowImage("asd",VC.CurrentFrame);
+        }
         if(cvWaitKey(5) == 27)
             break;
 

@@ -16,6 +16,8 @@ public:
     Blinking();
     int Init();
     int Analyze(IplImage*, CvRect, CvRect);
+    static int Findupperresize(CvRect);
+    static int Findlowerresize(CvRect);
 
 };
 
