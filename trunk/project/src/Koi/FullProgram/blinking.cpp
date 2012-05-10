@@ -46,16 +46,23 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
 
         REImage.y += Findupperresize(REImage);
         REImage.height -= Findupperresize(REImage);
-        LEImage.height -= Findlowerresize(REImage);
+        REImage.height -= Findlowerresize(REImage);
 
         LowerRE = CalcPixels(Preprocessing::Crop(REImage,inputimage));  //calculate the lower grayscale pixels, the eye for the right;
 
+        cvShowImage("Before2",Preprocessing::MakeGrayscale(Preprocessing::Crop(REImage,inputimage)));
+        cvMoveWindow("Before2", 550, 50);
+
         REImage.y = std::max(0,REImage.y + REImage.height); //move it upwards one height max to 0 though
+
+
+        cvShowImage("After2",Preprocessing::MakeGrayscale(Preprocessing::Crop(REImage,inputimage)));
+        cvMoveWindow("After2", 650, 50);
 
         UpperRE = CalcPixels(Preprocessing::Crop(REImage,inputimage));  //calculate the lower grayscale pixels, the eyelid for the right;
 
-        if(LowerRE - UpperRE < blinkingthreshold)
-            std::cout << "left eye closed, value: " << (float)LowerRE - (float)UpperRE << endl;
+        if(UpperRE - LowerRE < blinkingthreshold)
+            std::cout << "left eye closed, value: " << (float)UpperRE - (float)LowerRE << endl;
     }
 
     if(lefteye.x != -1)
@@ -81,8 +88,8 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
         UpperLE = CalcPixels(Preprocessing::Crop(LEImage,inputimage));
         //std::cout << "UPP: " << UpperLE << endl;
         //std::cout << "DIFF: " << UpperLE - LowerLE << std::endl;
-        if(LowerLE - UpperLE < blinkingthreshold)
-            std::cout << "right eye closed, value: " << (float)LowerLE - (float)UpperLE << endl;
+        if(UpperLE - LowerLE < blinkingthreshold)
+            std::cout << "right eye closed, value: " << (float)UpperLE - (float)LowerLE << endl;
     }
 
 
@@ -104,7 +111,7 @@ int Blinking::Findlowerresize(CvRect eye)
 
 int Blinking::Findupperresize(CvRect eye)
 {
-    return eye.height / 5;
+    return eye.height / 3;
 }
 
 

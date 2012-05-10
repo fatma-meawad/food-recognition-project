@@ -18,8 +18,8 @@ int Videocapture::Init(int camMode)
     {
     case CV_CAP_ANY:
         this->capture = cvCaptureFromCAM(-1);
-        cvSetCaptureProperty( this->capture, CV_CAP_PROP_FRAME_WIDTH, 640 );
-        cvSetCaptureProperty( this->capture, CV_CAP_PROP_FRAME_HEIGHT, 480 );
+      //  cvSetCaptureProperty( this->capture, CV_CAP_PROP_FRAME_WIDTH, 640 );
+      //  cvSetCaptureProperty( this->capture, CV_CAP_PROP_FRAME_HEIGHT, 480 );
       //  assert(this->capture);
 
         if(!this->capture)
