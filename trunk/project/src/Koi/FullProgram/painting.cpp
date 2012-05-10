@@ -27,6 +27,8 @@ IplImage* Painting::drawRect(IplImage * img, CvRect rect){
 IplImage* Painting::drawFullFace(IplImage * img, Facefeatures * ff)
 {
     drawRect(img, ff->mFace);
+    drawRect(img, ff->mLeftEye);
+    drawRect(img,ff->mRightEye);
     drawHairCross(img, ff->center(ff->mLeftEye));
     drawHairCross(img, ff->center(ff->mRightEye));
 

@@ -4,6 +4,8 @@
 #include "Includes.h"
 
 #define blinkingthreshold 12
+#define upperresize 20
+#define lowerresize 10
 
 class Blinking
 {

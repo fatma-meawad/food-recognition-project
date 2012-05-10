@@ -38,23 +38,34 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
     int UpperRE , LowerRE,UpperLE,LowerLE;
 
 
+
+
     if(righteye.x != -1)
     {
         REImage = righteye;
 
+        REImage.y += upperresize;
+        REImage.height -= upperresize;
+        LEImage.height -= lowerresize;
+
         LowerRE = CalcPixels(Preprocessing::Crop(REImage,inputimage));  //calculate the lower grayscale pixels, the eye for the right;
 
-        REImage.y = std::max(0,REImage.y - REImage.height); //move it upwards one height max to 0 though
+        REImage.y = std::max(0,REImage.y + REImage.height); //move it upwards one height max to 0 though
 
         UpperRE = CalcPixels(Preprocessing::Crop(REImage,inputimage));  //calculate the lower grayscale pixels, the eyelid for the right;
 
-        if(UpperRE - LowerRE < blinkingthreshold)
-            std::cout << "left eye closed, value: " << UpperRE - LowerRE << endl;
+        if(LowerRE - UpperRE < blinkingthreshold)
+            std::cout << "left eye closed, value: " << (float)LowerRE - (float)UpperRE << endl;
     }
 
     if(lefteye.x != -1)
     {
         LEImage = lefteye;
+
+
+        LEImage.y += upperresize;
+        LEImage.height -= upperresize;
+        LEImage.height -= lowerresize;
 
         LowerLE = CalcPixels(Preprocessing::Crop(LEImage,inputimage));
        // std::cout << "LOW: " << LowerLE << endl;
@@ -62,7 +73,7 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
         cvShowImage("Before",Preprocessing::MakeGrayscale(Preprocessing::Crop(LEImage,inputimage)));
         cvMoveWindow("Before", 500, 50);
 
-        LEImage.y = std::max(0,LEImage.y - LEImage.height);
+        LEImage.y = std::max(0,LEImage.y + LEImage.height);
 
         cvShowImage("After",Preprocessing::MakeGrayscale(Preprocessing::Crop(LEImage,inputimage)));
         cvMoveWindow("After", 600, 50);
@@ -70,8 +81,8 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
         UpperLE = CalcPixels(Preprocessing::Crop(LEImage,inputimage));
         //std::cout << "UPP: " << UpperLE << endl;
         //std::cout << "DIFF: " << UpperLE - LowerLE << std::endl;
-        if(UpperLE -LowerLE < blinkingthreshold)
-            std::cout << "right eye closed, value: " << UpperLE - LowerLE << endl;
+        if(LowerLE - UpperLE < blinkingthreshold)
+            std::cout << "right eye closed, value: " << (float)LowerLE - (float)UpperLE << endl;
     }
 
 
