@@ -184,8 +184,8 @@ Facefeatures* Featuredetection::detectfeatures(IplImage* img, Facefeatures* old_
     CvPoint A;
     if(0>detectface(img,&head.mFace,&old_face->mFace)){                   // mindre än noll för fel medelanden istället för -1
         fprintf( stderr, "Could not locate head\n" );
-        //head.mFace.x = -1;
-        head=*old_face;                                                  // om inget huvud hittas antar vi att det är på samma ställe som förra gången.
+        head.mFace.x = -1;
+       // head=*old_face;                                                  // om inget huvud hittas antar vi att det är på samma ställe som förra gången.
         return &head;
     }else{
         //cvShowImage("result", img);
