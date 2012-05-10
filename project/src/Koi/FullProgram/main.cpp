@@ -24,15 +24,18 @@ int main(int argc, char *argv[])
     else
         VC.InitAVI(argv[2]);
 
-    for(int i = 0; i < 10; i++){
-        d1.timeStamp = (double)i/10; d1.blinkingfreq = i;
-        d1.breathingfreq = i+1; d1.pulsefreq = i-1;
+  /*  for(int i = 0; i < 10; i++){
+        d1.timeStamp = (double) gettimeofday(&stop, NULL);
+        d1.blinkingfreq =  (int)gettimeofday(&stop, NULL)/123;
+        d1.breathingfreq = i+1;
+        d1.pulsefreq = i-1;
 
-        paint.mData.push_back(d1);
+        paint.mData.push_back();
     }
+*/
+    d1.timeStamp = 0;
+    paint.drawInit(&paint);
 
-    //paint.drawInit(&paint);
-    //paint.drawGraph();
 
     //cvNamedWindow("asd",CV_WINDOW_AUTOSIZE);
 
@@ -45,6 +48,7 @@ int main(int argc, char *argv[])
         VC.UpdateFrame();
 
         pFace = f.detectfeatures(VC.CurrentFrame,&old_face);
+
         if(pFace->mFace.x != -1)
         {
             old_face=*pFace;
@@ -54,10 +58,16 @@ int main(int argc, char *argv[])
             Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 
             paint.drawFullFace(VC.CurrentFrame,&old_face);  // Paint test
+            d1.blinkingfreq = 1000/(((stop.tv_sec - start.tv_sec)* 1000 + (stop.tv_usec - start.tv_usec)/1000.0) + 0.5);
+            d1.timeStamp++;
+            paint.mData.push_back(d1);
 
-            cvShowImage("asd",VC.CurrentFrame);
         }
-        if(cvWaitKey(5) == 27)
+
+         paint.drawGraph();
+         cvShowImage("asd",VC.CurrentFrame);
+
+        if(cvWaitKey(1) == 27)
             break;
 
         gettimeofday(&stop, NULL);
