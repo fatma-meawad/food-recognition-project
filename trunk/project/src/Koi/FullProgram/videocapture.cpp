@@ -54,6 +54,7 @@ IplImage * Videocapture::GetFrame()
     IplImage * resizedimage = cvCreateImage(cvSize(returnimage->width/scale,returnimage->height/scale),IPL_DEPTH_8U,returnimage->nChannels);
 
     cvResize(returnimage, resizedimage);
+    //cvReleaseImage(&returnimage);
 
     return resizedimage;
 }

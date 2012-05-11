@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
         {
             old_face=*pFace;
 
-            temp = p.Stabilize(VC.CurrentFrame, &old_face);
+            temp = p.Stabilize(VC.CurrentFrame, &old_face); // Useful?
 
             Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 
@@ -66,6 +66,11 @@ int main(int argc, char *argv[])
 
          paint.drawGraph();
          cvShowImage("asd",VC.CurrentFrame);
+         cvMoveWindow("asd", 700, 500);
+
+         // Free memory
+         cvReleaseImage(&VC.CurrentFrame);
+         cvReleaseImage(&temp);
 
         if(cvWaitKey(1) == 27)
             break;

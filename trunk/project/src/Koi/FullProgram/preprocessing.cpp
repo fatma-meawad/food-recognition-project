@@ -19,13 +19,11 @@ IplImage * Preprocessing::Crop(CvRect Size, IplImage * Image)
 
     CroppedImage = cvCreateImage(cvSize(Image->roi->width,Image->roi->height),Image->depth,Image->nChannels); //create return image
 
-
     cvCopyImage(Image,CroppedImage); //copy
 
     cvSetImageROI(Image, orgsize);
 
     return CroppedImage;
-
 }
 
 
@@ -35,6 +33,9 @@ IplImage * Preprocessing::MakeGrayscale(IplImage * Image)
     cvCvtColor(Image, Temp, CV_RGB2GRAY);
     //cvNot(Temp, Temp);    // Inverter
     //cvThreshold(Temp,Temp,150,250,CV_THRESH_BINARY_INV);    // Threshold
+
+    // Free memory
+    cvReleaseImage(&Image);
 
     return Temp;
 }

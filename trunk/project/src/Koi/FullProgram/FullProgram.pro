@@ -31,6 +31,9 @@ SOURCES += main.cpp \
 
 unix:!macx:!symbian: LIBS += -L$$PWD/../../../../../../../usr/lib/ -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_objdetect
 
+INCLUDEPATH += $$PWD/../../../../../../../usr/include/opencv-2.3.1
+DEPENDPATH += $$PWD/../../../../../../../usr/include/opencv-2.3.1
+
 INCLUDEPATH += $$PWD/../../../../../../../usr/include
 DEPENDPATH += $$PWD/../../../../../../../usr/include
 
