@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
         {
             old_face=*pFace;
 
-            p.Stabilize(VC.CurrentFrame, &old_face);
+            temp = p.Stabilize(VC.CurrentFrame, &old_face);
 
             Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 

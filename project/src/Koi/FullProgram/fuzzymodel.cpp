@@ -259,9 +259,9 @@ float Fuzzymodel::NormalizeBreathing(Data * data)
     return data->breathingfreq / maxbreathingrate;
 }
 
-void Fuzzymodel::NormalizePulse(Data * data)
+float Fuzzymodel::NormalizePulse(Data * data)
 {
-    return data->pulsefreq / (206 - (0.71 * subjectaget));
+    return data->pulsefreq / (206 - (0.71 * subjectage));
 }
 
 float Fuzzymodel::NormalizeBlinking(Data * data)

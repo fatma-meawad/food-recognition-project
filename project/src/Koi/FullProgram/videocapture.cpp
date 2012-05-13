@@ -48,9 +48,6 @@ IplImage * Videocapture::GetFrame()
         return NULL;
     }
 
-    if(this->CurrentFrame != NULL)
-        cvReleaseImage(&this->CurrentFrame);
-
     double scale = 1.4;
 
     IplImage * returnimage = cvQueryFrame(this->capture);
