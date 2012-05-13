@@ -29,6 +29,10 @@
 #define blinkingspeedmedhigh 298
 #define blinkingspeedhigh 400
 
+
+#define subjectage 20
+#define maxbreathingrate 120
+
 Fuzzymodel::Fuzzymodel()
 {
 }
@@ -36,6 +40,8 @@ Fuzzymodel::Fuzzymodel()
 float Fuzzymodel::AnalyzeTired(Data *data)
 {
     int breathing,pulse,blinking;
+
+    Fuzzymodel::NormalizeData(data);
 
     breathing = Fuzzymodel::AnalyzeBreathing(data);
     pulse = Fuzzymodel::AnalyzePulse(data);
@@ -47,6 +53,8 @@ float Fuzzymodel::AnalyzeTired(Data *data)
 float Fuzzymodel::AnalyzeStressed(Data *data)
 {
     int breathing,pulse,blinking;
+
+    Fuzzymodel::NormalizeData(data);
 
     breathing = Fuzzymodel::AnalyzeBreathing(data);
     pulse = Fuzzymodel::AnalyzePulse(data);
@@ -121,7 +129,7 @@ float Fuzzymodel::BlinkingLow(Data *data)
     if(data->blinkingfreq > blinkinglowlimit)
         return 1;
 
-    return std::max((float)0,(float)-k*data->blinkingfreq);
+    return std::max((float)0,(float)k*data->blinkingfreq); //kanske ska vara -
 
 }
 
@@ -137,7 +145,7 @@ float Fuzzymodel::BlinkingMed(Data *data)
         return std::max((float)0,(float)krising*data->blinkingfreq);
 
     if(data->blinkingfreq > blinkingmidhighlimit)
-        return std::max((float)0,(float)-kfalling*data->blinkingfreq);
+        return std::max((float)0,(float)kfalling*data->blinkingfreq); //kanske ska vara -
 
     return -1;
 
@@ -164,7 +172,7 @@ float Fuzzymodel::BreathingLow(Data *data)
     if(data->breathingfreq < breathinglowlimit)
         return 1;
 
-    return std::max((float)0,(float)-k*data->breathingfreq);
+    return std::max((float)0,(float)k*data->breathingfreq); //kanske ska vara -
 }
 
 float Fuzzymodel::BreathingMed(Data *data)
@@ -179,7 +187,7 @@ float Fuzzymodel::BreathingMed(Data *data)
         return std::max((float)0,(float)krising*data->breathingfreq);
 
     if(data->breathingfreq > breathingmedhighlimit)
-        return std::max((float)0,(float)-kfalling*data->breathingfreq);
+        return std::max((float)0,(float)kfalling*data->breathingfreq); //kanske ska vara -
 
     return -1;
 }
@@ -204,7 +212,7 @@ float Fuzzymodel::PulseLow(Data *data)
     if(data->pulsefreq < pulselowlimit)
         return 1;
 
-    return std::max((float)0,(float)-k*data->breathingfreq);
+    return std::max((float)0,(float)k*data->breathingfreq); //kanske ska vara -
 }
 
 float Fuzzymodel::PulseMed(Data * data)
@@ -219,7 +227,7 @@ float Fuzzymodel::PulseMed(Data * data)
         return std::max((float)0,(float)krising*data->breathingfreq);
 
     if(data->pulsefreq > pulsemedhighlimit)
-        return std::max((float)0,(float)-kfalling*data->pulsefreq);
+        return std::max((float)0,(float)kfalling*data->pulsefreq); //kanske ska vara -
 
     return -1;
 }
@@ -237,7 +245,7 @@ float Fuzzymodel::PulseHigh(Data * data)
 
 
 
-/*
+
 //Normalization, not needed atm
 void Fuzzymodel::NormalizeData(Data * data)
 {
@@ -248,12 +256,12 @@ void Fuzzymodel::NormalizeData(Data * data)
 
 float Fuzzymodel::NormalizeBreathing(Data * data)
 {
-    return 1;
+    return data->breathingfreq / maxbreathingrate;
 }
 
-float Fuzzymodel::NormalizePulse(Data * data)
+void Fuzzymodel::NormalizePulse(Data * data)
 {
-    return 1;
+    return data->pulsefreq / (206 - (0.71 * subjectaget));
 }
 
 float Fuzzymodel::NormalizeBlinking(Data * data)
@@ -261,4 +269,4 @@ float Fuzzymodel::NormalizeBlinking(Data * data)
     return 1;
 }
 //Normalization, not needed atm
-*/
+
