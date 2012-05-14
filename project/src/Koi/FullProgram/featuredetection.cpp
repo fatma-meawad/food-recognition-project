@@ -53,19 +53,16 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* old_face)
     if( !this->cascade )
     {
         fprintf( stderr, "ERROR: Could not load classifier cascade\n" );
-    }else{
-
+    }
+    else
+    {
         faces = GetFaces(img,this->cascade,this->storage,old_face); //sköter ansiktssökningen.
-
         if (old_face->x==-1){
-
 
             for( i = 0; i < (faces ? faces->total : 0); i++ )
             {
 
                 CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
-
-
 
                 cvSetImageROI(img,cvRect(r->x,r->y,r->width,r->height*3/5));
                 storage2 = cvCreateMemStorage(0);
@@ -91,10 +88,11 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* old_face)
             {
                 // Create a new rectangle for drawing the face
                 CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
-
-                r->x += img->roi->xOffset;
-                r->y += img->roi->yOffset;
-
+                if(img->roi)
+                {
+                    r->x += img->roi->xOffset;
+                    r->y += img->roi->yOffset;
+                }
 
                 if(abs(r->x-old_face->x)<50 && abs(r->y-old_face->y)<50)
                 {
@@ -170,7 +168,6 @@ int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes, Facefe
 
 Facefeatures* Featuredetection::detectfeatures(IplImage* img, Facefeatures* old_face){
     Facefeatures head;
-
 
     if(0>detectface(img,&head.mFace,&old_face->mFace)){                   // mindre än noll för fel medelanden istället för -1
         fprintf( stderr, "Could not locate head\n" );

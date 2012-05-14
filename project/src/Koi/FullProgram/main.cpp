@@ -60,13 +60,13 @@ int main(int argc, char *argv[])
             paint.drawFullFace(VC.CurrentFrame,&old_face);  // Paint test
             d1.blinkingfreq = 1000/(((stop.tv_sec - start.tv_sec)* 1000 + (stop.tv_usec - start.tv_usec)/1000.0) + 0.5);
             d1.timeStamp++;
-            paint.mData.push_back(d1);
+            //paint.mData.push_back(d1);
 
         }
 
-         paint.drawGraph();
+         //paint.drawGraph();
          cvShowImage("asd",VC.CurrentFrame);
-         cvMoveWindow("asd", 700, 500);
+         cvMoveWindow("asd", 700, 200);
 
          // Free memory
          cvReleaseImage(&VC.CurrentFrame);

@@ -124,28 +124,28 @@ float Fuzzymodel::AnalyzeBreathing(Data *data)
 //Fuzzy graph for blinking
 float Fuzzymodel::BlinkingLow(Data *data)
 {
-    float k = 1/(blinkingmidlowlimit - blinkinglowlimit);
+    float k = (-1)/(blinkingmidlowlimit - blinkinglowlimit);
 
-    if(data->blinkingfreq > blinkinglowlimit)
+    if(data->blinkingfreq < blinkinglowlimit)
         return 1;
 
-    return std::max((float)0,(float)k*data->blinkingfreq); //kanske ska vara -
+    return std::max((float)0,(float)k*(data->blinkingfreq - blinkinglowlimit) + 1);
 
 }
 
 float Fuzzymodel::BlinkingMed(Data *data)
 {
     float krising = 1/(blinkingmidlowlimit - blinkinglowlimit);
-    float kfalling = 1/(blinkinghighlimit - blinkingmidhighlimit);
+    float kfalling = (-1)/(blinkinghighlimit - blinkingmidhighlimit);
 
     if(data->blinkingfreq < blinkingmidhighlimit && data->blinkingfreq > blinkingmidlowlimit)
         return 1;
 
     if(data->blinkingfreq < blinkingmidlowlimit)
-        return std::max((float)0,(float)krising*data->blinkingfreq);
+        return std::max((float)0,(float)krising*(data->blinkingfreq - blinkinglowlimit));
 
     if(data->blinkingfreq > blinkingmidhighlimit)
-        return std::max((float)0,(float)kfalling*data->blinkingfreq); //kanske ska vara -
+        return std::max((float)0,(float)kfalling*(data->blinkingfreq - blinkingmidhighlimit) + 1);
 
     return -1;
 
@@ -158,7 +158,7 @@ float Fuzzymodel::BlinkingHigh(Data *data)
     if(data->blinkingfreq > blinkinghighlimit)
         return 1;
 
-    return std::max((float)0,(float)k*data->blinkingfreq);
+    return std::max((float)0,(float)k*data->blinkingfreq - blinkingmidhighlimit);
 }
 //Fuzzy graph for blinking
 
@@ -167,27 +167,27 @@ float Fuzzymodel::BlinkingHigh(Data *data)
 //Fuzzy graph for breathing
 float Fuzzymodel::BreathingLow(Data *data)
 {
-    float k = 1 / (breathingmedlowlimit - breathinglowlimit);
+    float k = (-1) / (breathingmedlowlimit - breathinglowlimit);
 
     if(data->breathingfreq < breathinglowlimit)
         return 1;
 
-    return std::max((float)0,(float)k*data->breathingfreq); //kanske ska vara -
+    return std::max((float)0,(float)k*(data->breathingfreq - blinkinglowlimit));
 }
 
 float Fuzzymodel::BreathingMed(Data *data)
 {
     float krising = 1/(breathingmedlowlimit - breathinglowlimit);
-    float kfalling = 1/(breathinghighlimit - breathingmedhighlimit);
+    float kfalling = (-1)/(breathinghighlimit - breathingmedhighlimit);
 
     if(data->breathingfreq < blinkingmidhighlimit && data->breathingfreq > blinkingmidlowlimit)
         return 1;
 
     if(data->breathingfreq < breathingmedlowlimit)
-        return std::max((float)0,(float)krising*data->breathingfreq);
+        return std::max((float)0,(float)krising*(data->breathingfreq - breathinglowlimit));
 
     if(data->breathingfreq > breathingmedhighlimit)
-        return std::max((float)0,(float)kfalling*data->breathingfreq); //kanske ska vara -
+        return std::max((float)0,(float)kfalling*(data->breathingfreq - breathingmedhighlimit) + 1);
 
     return -1;
 }
@@ -199,7 +199,7 @@ float Fuzzymodel::BreathingHigh(Data *data)
     if(data->breathingfreq > breathinghighlimit)
         return 1;
 
-    return std::max((float)0,(float)k*data->breathingfreq);
+    return std::max((float)0,(float)k*(data->breathingfreq - breathinghighlimit));
 }
 //Fuzzy graph for breating
 
@@ -207,27 +207,27 @@ float Fuzzymodel::BreathingHigh(Data *data)
 //Fuzzy graph for pulse
 float Fuzzymodel::PulseLow(Data *data)
 {
-    float k = 1 /(pulsemedlowlimit - pulselowlimit);
+    float k = (-1)/(pulsemedlowlimit - pulselowlimit);
 
     if(data->pulsefreq < pulselowlimit)
         return 1;
 
-    return std::max((float)0,(float)k*data->breathingfreq); //kanske ska vara -
+    return std::max((float)0,(float)k*(data->breathingfreq - pulselowlimit) + 1);
 }
 
 float Fuzzymodel::PulseMed(Data * data)
 {
     float krising = 1/(pulsemedlowlimit - pulselowlimit);
-    float kfalling = 1/(pulsehighlimit - pulsemedhighlimit);
+    float kfalling = (-1)/(pulsehighlimit - pulsemedhighlimit);
 
     if(data->pulsefreq < pulsemedhighlimit && data->pulsefreq > pulsemedlowlimit)
         return 1;
 
     if(data->pulsefreq < pulsemedlowlimit)
-        return std::max((float)0,(float)krising*data->breathingfreq);
+        return std::max((float)0,(float)krising*(data->breathingfreq - pulselowlimit) + 1);
 
     if(data->pulsefreq > pulsemedhighlimit)
-        return std::max((float)0,(float)kfalling*data->pulsefreq); //kanske ska vara -
+        return std::max((float)0,(float)kfalling*(data->pulsefreq - pulsemedhighlimit) + 1);
 
     return -1;
 }
@@ -239,7 +239,7 @@ float Fuzzymodel::PulseHigh(Data * data)
     if(data->pulsefreq > pulsehighlimit)
         return 1;
 
-    return std::max((float)0,(float)k*data->pulsefreq);
+    return std::max((float)0,(float)k*data->pulsefreq - breathingmedhighlimit);
 }
 //Fuzzy graph for pulse
 
