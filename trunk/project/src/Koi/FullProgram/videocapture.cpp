@@ -18,10 +18,6 @@ int Videocapture::Init(int camMode)
     {
     case CV_CAP_ANY:
         this->capture = cvCaptureFromCAM(-1);
-      //  cvSetCaptureProperty( this->capture, CV_CAP_PROP_FRAME_WIDTH, 640 );
-      //  cvSetCaptureProperty( this->capture, CV_CAP_PROP_FRAME_HEIGHT, 480 );
-      //  assert(this->capture);
-
         if(!this->capture)
         {
             std::cout << "Error: capture == NULL";
@@ -34,7 +30,6 @@ int Videocapture::Init(int camMode)
         return -2;
         break;
     }
-
 
     return 1;
 }
@@ -54,7 +49,6 @@ IplImage * Videocapture::GetFrame()
     IplImage * resizedimage = cvCreateImage(cvSize(returnimage->width/scale,returnimage->height/scale),IPL_DEPTH_8U,returnimage->nChannels);
 
     cvResize(returnimage, resizedimage);
-    //cvReleaseImage(&returnimage);
 
     return resizedimage;
 }
