@@ -5,177 +5,141 @@
 Featuredetection::Featuredetection()
 {
     this->cascade = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_frontalface_alt.xml", 0, 0, 0 );
-    this->cascade_eye = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
+    if( !this->cascade )
+    {
+        fprintf( stderr, "ERROR: Could not load classifier cascade\n" );
+    }
+    this->cascadeEye = (CvHaarClassifierCascade*)cvLoad( "../../../../../opencv/data/haarcascades/haarcascade_eye.xml", 0, 0, 0 );
+    if( !this->cascade )
+    {
+        fprintf( stderr, "ERROR: Could not load classifier cascadeEye\n" );
+    }
     this->storage = cvCreateMemStorage(0);
     this->storage2 = cvCreateMemStorage(0);
 }
 
-CvSeq * Featuredetection::GetFaces(IplImage* img, CvHaarClassifierCascade * cascade, CvMemStorage* storage, CvRect* old_face)
+CvSeq * Featuredetection::GetFaces(IplImage* img, CvRect* oldFace)  //function that finds the faces
 {
     CvSeq* faces;
     CvRect Size;
 
 
-    if(old_face->x == -1)
+    if(oldFace->x == -1)   //if previouse face was undefined then search the whole picture
     {
-REDO:
         cvResetImageROI(img);
-        faces = cvHaarDetectObjects( img, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); //om det gamla ansiktet är oanvändbart, analysera hela bilden.
-
-        cvClearMemStorage(storage);
+        faces = cvHaarDetectObjects( img, this->cascade, this->storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); //search the whole picture, and return results
+        cvClearMemStorage(this->storage);
         return faces;
     }
-    else
+    else    //if previouse face was defined
     {
 
-        Size = cvRect(old_face->x - ROITolerance,old_face->y - ROITolerance,old_face->width+ROITolerance* 2,old_face->height + ROITolerance *2);
+        Size = cvRect(oldFace->x - ROITolerance,oldFace->y - ROITolerance,oldFace->width+ROITolerance* 2,oldFace->height + ROITolerance *2);
 
-        cvSetImageROI(img,Size);
+        cvSetImageROI(img,Size);        //set a roi around where the previouse face to start seaching
 
-        faces = cvHaarDetectObjects( img, cascade, storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); //om föregående ansikte är användbart börja med att genomsök föregående ansikte + en thersh
+        faces = cvHaarDetectObjects( img, this->cascade, this->storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); // then search for a face in that region
 
         if(faces->total == 0)
         {
             cvClearSeq(faces);
-            goto REDO; //om det inte gunkade genomsök hela bilden;
+            cvResetImageROI(img);
+            faces = cvHaarDetectObjects( img, this->cascade, this->storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); //om det gamla ansiktet är oanvändbart, analysera hela bilden.
+            cvClearMemStorage(this->storage);
+            return faces;
         }
-        cvClearMemStorage(storage);
+        cvClearMemStorage(this->storage);
         return faces;
     }
 
 }
 
 
-int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* old_face){
+int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* oldFace){
     int i;
     CvSeq* faces;
 
-    if( !this->cascade )
-    {
-        fprintf( stderr, "ERROR: Could not load classifier cascade\n" );
-    }
-    else
-    {
-        faces = GetFaces(img,this->cascade,this->storage,old_face); //sköter ansiktssökningen.
-        if (old_face->x==-1){
 
-            for( i = 0; i < (faces ? faces->total : 0); i++ )
-            {
+    faces = GetFaces(img,oldFace); //call function which searches for faces
+    if (oldFace->x==-1)
+    {           //if previouse picture was undefined
 
-                CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
+        for( i = 0; i < faces->total; i++ )     //loop threw every face untill a propper one is found
+        {
 
-                cvSetImageROI(img,cvRect(r->x,r->y,r->width,r->height*3/5));
-                storage2 = cvCreateMemStorage(0);
-                CvSeq* eyes = cvHaarDetectObjects( img, this->cascade_eye, this->storage2,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );
+            CvRect*r= (CvRect*)cvGetSeqElem( faces, i );        //pick up a element
+
+            cvSetImageROI(img,cvRect(r->x,r->y,r->width,r->height*3/5));        //picks out the region around the eyes to varify that the head has eyes to varify the face abit more accurate
+            storage2 = cvCreateMemStorage(0);
+            CvSeq* eyes = cvHaarDetectObjects( img, this->cascadeEye, this->storage2,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) );        //searhes for the eyes
+            cvResetImageROI(img);
+            if (1<eyes->total){            //if it fins more than 1 eye then it sets that face into the face variable, clears the memory and returns the value of it
+
+
+
+                printf("Hittade ett ansikte innom gränsen\n");
+
+                *face = *r;
+                cvClearMemStorage(this->storage);
+                cvClearMemStorage(this->storage2);
                 cvResetImageROI(img);
-                if (1<eyes->total){
+                cvClearSeq(faces);
+                return 1;
 
+            }
+        }
+    }
+    else            //if previouse face was defined
+    {
+        for( i = 0; i < faces->total; i++ )     //loop threw every face
+        {
+            // Create a new rectangle for drawing the face
+            CvRect*r= (CvRect*)cvGetSeqElem( faces, i ); //pick out a element
+            if(img->roi)            // if roi is true then the points where found on a picture with roi active and compensation is aplied
+            {
+                r->x += img->roi->xOffset;
+                r->y += img->roi->yOffset;
+            }
 
-
-                    printf("Hittade ett ansikte innom gränsen\n");
-
+            if(abs(r->x-oldFace->x)<50 && abs(r->y-oldFace->y)<50)        // compares it with the position of the oldFace which is the value from the previouse picture, aswell as width and height
+            {
+                if(abs(r->width-oldFace->width)<50 && abs(r->height-oldFace->height)<50 )
+                {
+                    printf("Hittade ett ansikte innom gränsen\n");          // if it is within the limit then it is a propper face and sets face variable to it and clear memory storage and returns the value
                     *face = *r;
                     cvClearMemStorage(this->storage);
                     cvClearMemStorage(this->storage2);
                     cvResetImageROI(img);
                     cvClearSeq(faces);
                     return 1;
-
                 }
             }
-        }else{
-            for( i = 0; i < (faces ? faces->total : 0); i++ )
-            {
-                // Create a new rectangle for drawing the face
-                CvRect*r= (CvRect*)cvGetSeqElem( faces, i );
-                if(img->roi)
-                {
-                    r->x += img->roi->xOffset;
-                    r->y += img->roi->yOffset;
-                }
+            printf("Felaktigt ansikte");
 
-                if(abs(r->x-old_face->x)<50 && abs(r->y-old_face->y)<50)
-                {
-                    if(abs(r->width-old_face->width)<50 && abs(r->height-old_face->height)<50 )
-                    {
-                        printf("Hittade ett ansikte innom gränsen\n");
-                        *face = *r;
-                        cvClearMemStorage(this->storage);
-                        cvClearMemStorage(this->storage2);
-                        cvResetImageROI(img);
-                        cvClearSeq(faces);
-                        return 1;
-                    }
-                }
-                printf("Felaktigt ansikte");
-
-            }
         }
-
     }
 
-    cvClearMemStorage(this->storage);
+
+
+    cvClearMemStorage(this->storage);       //if no propper face was found clear mem storage and return -1 which means no face detected
     cvClearMemStorage(this->storage2);
     cvResetImageROI(img);
     cvClearSeq(faces);
     return -1;
 }
 
-int Featuredetection::detectEye (IplImage* img,CvPoint roi, CvRect* eyes, Facefeatures* old_face){
-    int i;
-    CvSeq* faces;
+// detect eye removed can be found in revision 89 or earlier
 
 
-
-    if( !this->cascade_eye )
-    {
-        fprintf( stderr, "ERROR: Could not load classifier cascade\n" );
+Facefeatures* Featuredetection::detectfeatures(IplImage* img, Facefeatures* oldFace){
+    Facefeatures* head= new Facefeatures;
+    if(0>detectface(img,&head->mFace,&oldFace->mFace)){                   //function that checks for "propper" faces, if such a face is found the function returns a number above 0 and a head object, if not then a number bellow 0
+        fprintf( stderr, "Could not locate head\n" );                   // if no propper face was found then faces gets set to its undefined value at head->mFace.x = -1; and returns the head with the bad information.
+        head->mFace.x = -1;
+        return head;
     }else{
-
-
-        try
-        {
-            faces = cvHaarDetectObjects( img, this->cascade_eye, this->storage,1.1, 2, CV_HAAR_DO_CANNY_PRUNING,cvSize(40, 40) ); //blev konstigt ibland så fick prova en try cath sats för att ta reda på felet.
-        }
-        catch(exception e)
-        {
-            printf("exception i eye");
-            return -2; //ibland får man  OpenCV Error: Incorrect size of input array (Non-positive cols or rows) in cvInitMatHeader, file /home/madde/AI/opencv/modules/core/src/array.cpp, line 146
-
-        }
-
-        for( i = 0; i < (faces ? faces->total : 0); i++ )
-        {
-            // Create a new rectangle for drawing the face
-            CvRect*r = (CvRect*)cvGetSeqElem( faces, i );
-            *eyes=*r;
-
-            eyes->x=r->x+roi.x;
-            eyes->y=r->y+roi.y;
-
-            // Find the dimensions of the face,and scale it if necessary
-            cvClearMemStorage( this->storage );
-            cvClearSeq(faces);
-            return 1;
-        }
-    }
-
-    cvClearMemStorage(this->storage);
-    cvClearSeq(faces);
-    return -1;
-}
-
-
-Facefeatures* Featuredetection::detectfeatures(IplImage* img, Facefeatures* old_face){
-    Facefeatures head;
-
-    if(0>detectface(img,&head.mFace,&old_face->mFace)){                   // mindre än noll för fel medelanden istället för -1
-        fprintf( stderr, "Could not locate head\n" );
-        head.mFace.x = -1;
-        return &head;
-    }else{
-        head.mRightEye = cvRect(head.mFace.x +head.mFace.width/2 - head.mFace.width/15 - head.mFace.width/3.5,head.mFace.y + head.mFace.height/4.8 ,head.mFace.width/3.5,head.mFace.height*3/5 - head.mFace.height/3.5);
-        head.mLeftEye = cvRect(head.mFace.x+head.mFace.width/2 + head.mFace.width/15,head.mFace.y + head.mFace.height/4.8,head.mFace.width/3.5,head.mFace.height*3/5 - head.mFace.height/3.5);
-        return &head;
+        head->mRightEye = cvRect(head->mFace.x +head->mFace.width/2 - head->mFace.width/15 - head->mFace.width/3.5,head->mFace.y + head->mFace.height/4.8 ,head->mFace.width/3.5,head->mFace.height*3/5 - head->mFace.height/3.5);        // using symmetry to place out the regions for the eyes using the symmetry of the face
+        head->mLeftEye = cvRect(head->mFace.x+head->mFace.width/2 + head->mFace.width/15,head->mFace.y + head->mFace.height/4.8,head->mFace.width/3.5,head->mFace.height*3/5 - head->mFace.height/3.5);
+        return head;
     }
 }

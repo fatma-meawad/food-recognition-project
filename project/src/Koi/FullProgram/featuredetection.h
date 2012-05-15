@@ -10,16 +10,15 @@ class Featuredetection
 private:
 
     CvHaarClassifierCascade* cascade;
-    CvHaarClassifierCascade* cascade_eye;
+    CvHaarClassifierCascade* cascadeEye;
     CvMemStorage * storage;
     CvMemStorage * storage2;
 
 public:
     Featuredetection();
-    Facefeatures* detectfeatures(IplImage* img, Facefeatures* old_face);                  //old_face.face.x==-1 när oldface inte har någon info
-    int detectface (IplImage* img, CvRect* face, CvRect* old_face);                      //face.x==-1 -||-
-    int detectEye (IplImage* img,CvPoint roi, CvRect* eyes, Facefeatures* old_face);
-    CvSeq * GetFaces(IplImage* img, CvHaarClassifierCascade * cascade, CvMemStorage* storage, CvRect* old_face);
+    Facefeatures* detectfeatures(IplImage* img, Facefeatures* oldFace);                  //oldFace.face.x==-1 när oldface inte har någon info
+    int detectface (IplImage* img, CvRect* face, CvRect* oldFace);
+    CvSeq * GetFaces(IplImage* img, CvRect* oldFace);
 };
 
 #endif // FEATUREDETECTION_H
