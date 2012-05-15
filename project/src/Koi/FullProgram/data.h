@@ -3,11 +3,15 @@
 
 #include "Includes.h"
 
+/**
+  *  Class to store relevant data to be analyzed
+  */
+
 class Data
 {
 
 public:
-    Data();
+    Data(){}
 
     double timeStamp;
 

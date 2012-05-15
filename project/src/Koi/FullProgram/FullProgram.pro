@@ -16,7 +16,6 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    data.cpp \
     videocapture.cpp \
     breathing.cpp \
     blinking.cpp \

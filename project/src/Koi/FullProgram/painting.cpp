@@ -3,11 +3,8 @@
 
 #define WindowName "Graph"
 
-Painting* paint;
+Painting* paint;    // In order to reach the memberfunctions outside the class-object
 
-Painting::Painting()
-{
-}
 // Draw haircross
 IplImage* Painting::drawHairCross(IplImage* img, CvPoint p){
     cvLine(img,cvPoint(p.x-15,p.y),cvPoint(p.x+15,p.y),cvScalar(100,0,100), 1);
@@ -23,7 +20,7 @@ IplImage* Painting::drawRect(IplImage * img, CvRect rect){
     return img;
 }
 
-// Draw alla features
+// Draw all face features
 IplImage* Painting::drawFullFace(IplImage * img, Facefeatures * ff)
 {
     drawRect(img, ff->mFace);
@@ -35,19 +32,20 @@ IplImage* Painting::drawFullFace(IplImage * img, Facefeatures * ff)
     return img;
 }
 
-// Draw circle from point
-IplImage* Painting::drawCircle(IplImage * img, CvPoint p, int c, int t)
+// Draw circle from cvPoint
+IplImage* Painting::drawCircle(IplImage * img, CvPoint point, int colour, int thickness)
 {
-    if(c == 0)
-        cvCircle(img,p, 3,cvScalar(0,0,255),t);
-    else if(c == 1)
-        cvCircle(img,p, 3,cvScalar(0,255,0),t);
+    if(colour == 0)
+        cvCircle(img,point, 3,cvScalar(0,0,255),thickness);
+    else if(colour == 1)
+        cvCircle(img,point, 3,cvScalar(0,255,0),thickness);
     else
-        cvCircle(img,p, 3,cvScalar(255,0,0),t);
+        cvCircle(img,point, 3,cvScalar(255,0,0),thickness);
 
     return img;
 }
 
+// Updates the graphs when right och left has been clicked
 void Painting::update(int x, int y)
 {
     if(x<100 && y<100 && mSelect>0){
@@ -60,10 +58,9 @@ void Painting::update(int x, int y)
     }
 }
 
-// Mouse callback to capture button clicks and similar
-void mouse( int event, int x, int y, int flags, void* param )
+// Mouse callback to capture button clicks
+void mouse( int event, int x, int y, int, void*)
 {
-
     switch( event ){
 
     case CV_EVENT_LBUTTONDOWN:
@@ -75,7 +72,7 @@ void mouse( int event, int x, int y, int flags, void* param )
 // Initialize window and variables
 void Painting::drawInit(Painting* p)
 {
-    paint = p;
+    paint = p;  // Save pointer to class object
 
     // Create a window
     namedWindow(WindowName);
@@ -93,9 +90,10 @@ void Painting::drawInit(Painting* p)
     mRightButton = cvRect(490, 10, 100, 100);
 }
 
-// Graphs 2
+// Draw graphs      -- todo, adjust to fit in window
 void Painting::drawGraph()
 {
+    // Paint the canvas white
     cvZero(mImage);
     cvRectangleR(mImage,cvRect(0,0,500,500),cvScalar(255,255,255), -1);
 
@@ -105,9 +103,11 @@ void Painting::drawGraph()
     int    lineWidth=1;
     cvInitFont(&font,CV_FONT_HERSHEY_SIMPLEX|CV_FONT_ITALIC, hScale,vScale,0,lineWidth);
 
+    // Add text to canvas
     cvPutText (mImage,"Left",cvPoint(20,50), &font, cvScalar(200,0,0));
     cvPutText (mImage,"Right",cvPoint(420,50), &font, cvScalar(0,200,0));
 
+    // Iterate the vector of data and center the selected objects
     if(mData.size())
     {
         int xScale = 200;
@@ -122,8 +122,8 @@ void Painting::drawGraph()
             t = -1;
 
         drawCircle(mImage,cvPoint(mData[0].timeStamp * xScale + xOffSet,yOffSet1 - mData[0].pulsefreq * yScale),0,t);
-        drawCircle(mImage,cvPoint(mData[0].timeStamp * xScale + xOffSet,yOffSet2 - mData[0].blinkingfreq * yScale),0,t);
-        drawCircle(mImage,cvPoint(mData[0].timeStamp * xScale + xOffSet,yOffSet3 - mData[0].breathingfreq * yScale),0,t);
+        drawCircle(mImage,cvPoint(mData[0].timeStamp * xScale + xOffSet,yOffSet2 - mData[0].blinkingfreq * yScale),1,t);
+        drawCircle(mImage,cvPoint(mData[0].timeStamp * xScale + xOffSet,yOffSet3 - mData[0].breathingfreq * yScale),2,t);
 
         for(unsigned int i = 1; i<mData.size(); i++)
         {
