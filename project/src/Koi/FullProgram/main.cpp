@@ -10,9 +10,7 @@ int main(int argc, char *argv[])
     old_face.mFace.x=-1;   // säger att old_face inte är användbar;
     pFace = &face;
 
-    Preprocessing p;
     Featuredetection f;
-    IplImage * temp;
 
     Painting paint;
     Data d1;
@@ -53,8 +51,6 @@ int main(int argc, char *argv[])
         {
             old_face=*pFace;
 
-            temp = p.Stabilize(VC.CurrentFrame, &old_face);
-
             Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 
             paint.drawFullFace(VC.CurrentFrame,&old_face);  // Paint test
@@ -70,7 +66,6 @@ int main(int argc, char *argv[])
 
          // Free memory
          cvReleaseImage(&VC.CurrentFrame);
-         cvReleaseImage(&temp);
 
         if(cvWaitKey(1) == 27)
             break;
