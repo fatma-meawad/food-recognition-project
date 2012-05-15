@@ -3,13 +3,17 @@
 
 #include "Includes.h"
 
+/**
+  * Class for painting and representing data as graphs
+  */
+
 class Facefeatures;
 class Data;
 
 class Painting
 {
 public:
-    Painting();
+    Painting(){}
 
     static IplImage* drawFullFace(IplImage*, Facefeatures*);
     static IplImage* drawHairCross(IplImage*, CvPoint);
