@@ -40,6 +40,16 @@ IplImage * Preprocessing::MakeGrayscale(IplImage * Image)
     return Temp;
 }
 
+IplImage * Preprocessing::MakeHSV(IplImage * Image)
+{
+    IplImage * Temp = cvCreateImage(cvSize(Image->width,Image->height),IPL_DEPTH_8U,3);
+    cvCvtColor(Image, Temp, CV_RGB2HSV);
+
+    cvReleaseImage(&Image);
+
+    return Temp;
+}
+
 IplImage * Preprocessing::Stabilize(IplImage * Image,Facefeatures* Inputfeatures)
 {
 
