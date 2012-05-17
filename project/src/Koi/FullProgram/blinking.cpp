@@ -1,107 +1,72 @@
 #include "blinking.h"
 
-Blinking::Blinking()
-{
-}
-
 
 
 int Blinking::Init()
- {
+{
     return 1;
 }
 
-int CalcPixels(IplImage * inputImage)
+bool CalcPixels(IplImage * inputImage)
 {
-    int pixelgray = 0;
     CvScalar pixel;
-    IplImage * input = Preprocessing::MakeGrayscale(inputImage);
+    IplImage * input = cvCreateImage(cvSize(inputImage->width,inputImage->height),IPL_DEPTH_8U,inputImage->nChannels);
+    input = Preprocessing::MakeGrayscale(inputImage);
 
-    for(int i = 0; i < inputImage->height; i++)
+    int totX = 0;
+    int area = 0;
+    bool clear;
+    bool closed;
+
+    for(int j = input->height/3; j < input->height*2/3; j++)
     {
-        for(int j = 0; j < inputImage->width; j++)
+        clear = true;
+        for(int i = input->width*2/4; i < input->width; i++)
         {
-            pixel = cvGetAt(input,i,j);
-            pixelgray += pixel.val[0];
+            pixel = cvGetAt(input,j,i);
+            if(pixel.val[0] != 255)
+            {
+                clear = false;
+                area++;
+            }
         }
+
+        if(clear)
+            totX++;
     }
 
-    return pixelgray/(inputImage->imageSize);
+    //std::cout << "Height: " << input->height/10 << ", Total lines: " << totX << ", Area: " << (double)area/((input->width/2)*(input->height/3)) << "     ";
 
+    if((totX - 1 > (input->height)/10  || (double)area/((input->width/2)*(input->height/3)) < 0.2))
+        closed = true;
+    else
+        closed = false;
 
+    return closed;
 }
 
 int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
 {
-    CvRect REImage, LEImage;
- //   IplImage * RightEye, LeftEye;
-    int UpperRE , LowerRE,UpperLE,LowerLE;
-
-
-
+    CvRect REImage;
 
     if(righteye.x != -1)
     {
         REImage = righteye;
-
         REImage.y += Findupperresize(REImage);
         REImage.height -= Findupperresize(REImage);
         REImage.height -= Findlowerresize(REImage);
 
-        LowerRE = CalcPixels(Preprocessing::Crop(REImage,inputimage));  //calculate the lower grayscale pixels, the eye for the right;
+        if(CalcPixels(Preprocessing::Crop(REImage,inputimage)))
+            std::cout  << "Right Closed!!!" << std::endl;
+        else
+            std::cout  << "Right Open!!!" << std::endl;
 
-        cvShowImage("Before2",Preprocessing::MakeGrayscale(Preprocessing::Crop(REImage,inputimage)));
-        cvMoveWindow("Before2", 550, 50);
-
-        REImage.y = std::max(0,REImage.y + REImage.height); //move it upwards one height max to 0 though
-
-
-        cvShowImage("After2",Preprocessing::MakeGrayscale(Preprocessing::Crop(REImage,inputimage)));
-        cvMoveWindow("After2", 650, 50);
-
-        UpperRE = CalcPixels(Preprocessing::Crop(REImage,inputimage));  //calculate the lower grayscale pixels, the eyelid for the right;
-
-        if(UpperRE - LowerRE < blinkingthreshold)
-            std::cout << "left eye closed, value: " << (float)UpperRE - (float)LowerRE << endl;
+        //cin.get();
+        cvShowImage("Eye",Preprocessing::MakeGrayscale(Preprocessing::Crop(REImage,inputimage)));
+        cvMoveWindow("Eye", 500, 50);
     }
-
-    if(lefteye.x != -1)
-    {
-        LEImage = lefteye;
-
-
-        LEImage.y += Findupperresize(LEImage);
-        LEImage.height -= Findupperresize(LEImage);
-        LEImage.height -= Findlowerresize(LEImage);
-
-        LowerLE = CalcPixels(Preprocessing::Crop(LEImage,inputimage));
-       // std::cout << "LOW: " << LowerLE << endl;
-
-        cvShowImage("Before",Preprocessing::MakeGrayscale(Preprocessing::Crop(LEImage,inputimage)));
-        cvMoveWindow("Before", 500, 50);
-
-        LEImage.y = std::max(0,LEImage.y + LEImage.height);
-
-        cvShowImage("After",Preprocessing::MakeGrayscale(Preprocessing::Crop(LEImage,inputimage)));
-        cvMoveWindow("After", 600, 50);
-
-        UpperLE = CalcPixels(Preprocessing::Crop(LEImage,inputimage));
-        //std::cout << "UPP: " << UpperLE << endl;
-        //std::cout << "DIFF: " << UpperLE - LowerLE << std::endl;
-        if(UpperLE - LowerLE < blinkingthreshold)
-            std::cout << "right eye closed, value: " << (float)UpperLE - (float)LowerLE << endl;
-    }
-
 
     return 1;
-
-
-  //  REImage.height += REImage.height;
-  //  LEImage.height += LEImage.height;
-
-   // RightEye = Preprocessing::Crop(REImage,inputimage);
-   // LeftEye = Preprocessing::Crop(LEImage,inputimage);
-
 }
 
 int Blinking::Findlowerresize(CvRect eye)

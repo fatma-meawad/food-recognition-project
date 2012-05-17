@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
             break;
 
         gettimeofday(&stop, NULL);
-        cout << "FPS: " << 1000/(((stop.tv_sec - start.tv_sec)* 1000 + (stop.tv_usec - start.tv_usec)/1000.0) + 0.5) << endl;
+        //cout << "FPS: " << 1000/(((stop.tv_sec - start.tv_sec)* 1000 + (stop.tv_usec - start.tv_usec)/1000.0) + 0.5) << endl;
     }
 
     //cvDestroyWindow("asd");
