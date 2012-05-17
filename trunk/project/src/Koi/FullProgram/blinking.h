@@ -10,10 +10,8 @@
 class Blinking
 {
 
-
-
 public:
-    Blinking();
+    Blinking(){}
     int Init();
     int Analyze(IplImage*, CvRect, CvRect);
     static int Findupperresize(CvRect);

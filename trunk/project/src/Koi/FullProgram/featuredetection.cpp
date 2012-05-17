@@ -75,10 +75,6 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* oldFace){
             cvResetImageROI(img);
             if (1<eyes->total){            //if it fins more than 1 eye then it sets that face into the face variable, clears the memory and returns the value of it
 
-
-
-                printf("Hittade ett ansikte innom gränsen\n");
-
                 *face = *r;
                 cvClearMemStorage(this->storage);
                 cvClearMemStorage(this->storage2);
@@ -105,7 +101,6 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* oldFace){
             {
                 if(abs(r->width-oldFace->width)<50 && abs(r->height-oldFace->height)<50 )
                 {
-                    printf("Hittade ett ansikte innom gränsen\n");          // if it is within the limit then it is a propper face and sets face variable to it and clear memory storage and returns the value
                     *face = *r;
                     cvClearMemStorage(this->storage);
                     cvClearMemStorage(this->storage2);
