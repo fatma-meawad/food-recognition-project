@@ -14,6 +14,7 @@ public:
     Preprocessing();
 
     static IplImage * MakeGrayscale(IplImage *);
+    static IplImage * MakeHSV(IplImage *);
     static IplImage * Crop(CvRect,IplImage*);
 
     IplImage * Stabilize(IplImage*,Facefeatures *);
