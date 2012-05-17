@@ -17,13 +17,20 @@ int Videocapture::Init(int camMode)
     switch(cm)
     {
     case CV_CAP_ANY:
-        this->capture = cvCaptureFromCAM(-1);
+        this->capture = cvCaptureFromCAM(CV_CAP_ANY);
         if(!this->capture)
         {
             std::cout << "Error: capture == NULL";
             return -1;
         }
         break;
+    case 3:
+        this->capture = cvCaptureFromCAM(3);
+        if(!this->capture)
+        {
+            std::cout << "Error: capture == NULL";
+            return -1;
+        }
 
     default:
         std::cout << "invalid cammode";

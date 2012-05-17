@@ -17,8 +17,18 @@ int main(int argc, char *argv[])
 
     timeval start, stop;
 
+
+//    qDebug() << QImageReader::supportedImageFormats();
+
     if(argc == 1)
-        VC.Init(CV_CAP_ANY);
+    {
+        //VC.Init(CV_CAP_ANY);
+        if(VC.Init(CV_CAP_ANY) < 0)
+        {
+            return -1;
+            std::cout << "Error capture == NULL";
+        }
+    }
     else
         VC.InitAVI(argv[2]);
 
@@ -31,6 +41,7 @@ int main(int argc, char *argv[])
         paint.mData.push_back();
     }
 */
+
     d1.timeStamp = 0;
     paint.drawInit(&paint);
 

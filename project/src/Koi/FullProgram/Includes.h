@@ -15,6 +15,8 @@
 #include <ctime>
 #include <unistd.h>
 #include <sys/time.h>
+ #include <QDebug>
+ #include <QtGui/QImageReader>
 
 
 #include "blinking.h"

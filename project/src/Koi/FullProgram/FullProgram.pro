@@ -11,6 +11,7 @@ QT       -= gui
 TARGET = FullProgram
 CONFIG   += console
 CONFIG   -= app_bundle
+QTPLUGIN += qjpeg
 
 TEMPLATE = app
 
