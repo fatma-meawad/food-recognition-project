@@ -72,6 +72,8 @@ int main(int argc, char *argv[])
         }
 
 
+
+
          //paint.drawGraph();
          cvShowImage("asd",VC.CurrentFrame);
          cvMoveWindow("asd", 700, 200);
