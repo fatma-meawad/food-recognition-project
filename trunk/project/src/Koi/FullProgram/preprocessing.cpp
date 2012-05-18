@@ -87,3 +87,24 @@ float Preprocessing::Pointdistance(CvPoint p1, CvPoint p2)
 {
     return sqrt((double)pow((p1.x - p2.x),2) + (double)pow((p1.y - p2.y),2));
 }
+
+IplImage * Preprocessing::MakeDiffImage(Videocapture VC)
+{
+
+
+    if(VC.CurrentFrame == NULL)
+        return NULL;
+
+    IplImage * Temp = cvCreateImage(cvSize(VC.CurrentFrame->width,VC.CurrentFrame->height),VC.CurrentFrame->depth,VC.CurrentFrame->nChannels);
+
+    cvCopyImage(VC.CurrentFrame,Temp);
+    VC.UpdateFrame();
+
+
+    cvAbsDiff(Temp,VC.CurrentFrame,VC.CurrentFrame);
+
+    cvReleaseImage(&Temp);
+
+    return VC.CurrentFrame; //kan vara void om man vill
+
+}
