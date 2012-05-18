@@ -5,6 +5,8 @@
 
 #define Tolerance 20
 
+class Videocapture;
+
 class Preprocessing
 {
     CvPoint CurrentP;
@@ -16,6 +18,7 @@ public:
     static IplImage * MakeGrayscale(IplImage *);
     static IplImage * MakeHSV(IplImage *);
     static IplImage * Crop(CvRect,IplImage*);
+    static IplImage * MakeDiffImage(Videocapture VC);
 
     IplImage * Stabilize(IplImage*,Facefeatures *);
     static float Pointdistance(CvPoint p1, CvPoint p2);
