@@ -6,6 +6,7 @@ double massDiff = 0.5;
 double areaDiff = 0.5;
 double areaDiff2 = 0.5;
 int avg = samples;
+CvPoint massCenter = cvPoint(0,0);
 
 int Blinking::Init()
 {
@@ -72,15 +73,16 @@ bool CalcPixels(IplImage * inputImage)
     lengthToCenter = (sqrt((darkCenter.x - (sX + eX)/2)*(darkCenter.x - (sX + eX)/2) + (darkCenter.y - (sY + eY)/2)*(darkCenter.y - (sY + eY)/2)))
             /(sqrt(((eX - sX)/2 - sX)*((eX - sX)/2 - sX) + ((eY - sY)/2 - sY)*((eY - sY)/2 - sY)));
 
-    //std::cout << abs(lengthToCenter - massDiff) << "\t" << abs((double)area/((eX - sX)*(eY - sY)) - areaDiff) << "\t"
-    //          << abs(lengthToCenter - massDiff) + abs((double)area/((eX - sX)*(eY - sY)) - areaDiff) << "\t"
-    //          << abs(areaDiff2 - area2) << "\t";
+    double diffCenter = (sqrt((darkCenter.x - massCenter.x)*(darkCenter.x - massCenter.x) + (darkCenter.y - massCenter.y)*(darkCenter.y - massCenter.y)))
+            /(sqrt(((eX - sX))*((eX - sX)) + ((eY - sY))*((eY - sY))));
 
     //std::cout << (massDiff - lengthToCenter) << "\t" << (areaDiff - (double)area/((eX - sX)*(eY - sY))) << "\t" << (areaDiff2 - area2) << "\t";
     std::cout << (massDiff - lengthToCenter) + (areaDiff - (double)area/((eX - sX)*(eY - sY))) + (areaDiff2 - area2) << "\t"
-              << (massDiff + areaDiff + areaDiff2)/2 << "\t";
+              << (massDiff + areaDiff + areaDiff2)/3 << "\t";
 
-    if((massDiff - lengthToCenter) + (areaDiff - (double)area/((eX - sX)*(eY - sY))) + (areaDiff2 - area2) > (massDiff + areaDiff + areaDiff2)/2)
+    std::cout << "Center: " << massCenter.x << ", " << massCenter.y << "\t" << diffCenter << "\t";
+
+    if((massDiff - lengthToCenter) + (areaDiff - (double)area/((eX - sX)*(eY - sY))) + (areaDiff2 - area2) > (massDiff + areaDiff + areaDiff2)/3)
         closed = true;
     else
         closed = false;
@@ -94,11 +96,15 @@ bool CalcPixels(IplImage * inputImage)
             massDiff = (lengthToCenter + massDiff)/10;
             areaDiff = ((double)area/((eX - sX)*(eY - sY)) + areaDiff)/10;
             areaDiff2 = (areaDiff2 + area2)/10;
+            massCenter.x = massCenter.x/10;
+            massCenter.y = massCenter.y/10;
 
             std::cout << "Start! " << std::endl << massDiff << "\t" << areaDiff << "\t" << areaDiff2;
         }
         else
         {
+            massCenter.x += darkCenter.x;
+            massCenter.y += darkCenter.y;
             massDiff += lengthToCenter;
             areaDiff += (double)area/((eX - sX)*(eY - sY));
             areaDiff2 += area2;
