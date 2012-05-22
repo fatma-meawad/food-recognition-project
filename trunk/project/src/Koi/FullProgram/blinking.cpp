@@ -2,11 +2,9 @@
 
 #define samples 10
 
-double massDiff = 0.5;
-double areaDiff = 0.5;
-double areaDiff2 = 0.5;
 int avg = samples;
-CvPoint massCenter = cvPoint(0,0);
+double avgMass = 0;
+CvPoint avgCenter = cvPoint(0,0);
 
 int Blinking::Init()
 {
@@ -19,103 +17,79 @@ bool CalcPixels(IplImage * inputImage)
     IplImage * input;// = cvCreateImage(cvSize(inputImage->width,inputImage->height),IPL_DEPTH_8U,inputImage->nChannels);
     input = Preprocessing::MakeGrayscale(inputImage);
 
-    int linesX = 0;
-    double area = 0;
-    double area2 = 0;
-    CvPoint darkCenter = cvPoint(0,0);
-    double lengthToCenter;
-    bool clear;
+    double mass = 0;
     bool closed;
+    CvPoint massCenter = cvPoint(0,0);
 
-    int sX = input->width*2/4;
-    int eX = input->width;
-    int sY = input->height/3;
-    int eY = input->height*2/3;
-
-    // Second area test
-    int sX2 = input->width/3;
-    int eX2= input->width*2/3;
-    int sY2 = input->height*2/5;
-    int eY2 = input->height*4/5;
-
-    for(int j = sY; j < eY; j++)
-    {
-        clear = true;
-        for(int i = sX; i < eX; i++)
-        {
-            pixel = cvGetAt(input,j,i);
-            if(pixel.val[0] != 255)
-            {
-                darkCenter.x += i;
-                darkCenter.y += j;
-                clear = false;
-                area++;
-            }
-        }
-
-        if(clear)
-            linesX++;
-    }
-
-    darkCenter.x = darkCenter.x/area;
-    darkCenter.y = darkCenter.y/area;
-
-    for(int j = sY2 ; j < eY2; j++)
-        for(int i =  sX2; i < eX2; i++)
-        {
-            pixel = cvGetAt(input,j,i);
-            if(pixel.val[0] != 255)
-                area2++;
-        }
-
-    area = area/((eY - sY)*(eX - sX));
-    area2 = area2/((eY2 - sY2)*(eX2 - sX2));
-
-    lengthToCenter = (sqrt((darkCenter.x - (sX + eX)/2)*(darkCenter.x - (sX + eX)/2) + (darkCenter.y - (sY + eY)/2)*(darkCenter.y - (sY + eY)/2)))
-            /(sqrt(((eX - sX)/2 - sX)*((eX - sX)/2 - sX) + ((eY - sY)/2 - sY)*((eY - sY)/2 - sY)));
-
-    double diffCenter = (sqrt((darkCenter.x - massCenter.x)*(darkCenter.x - massCenter.x) + (darkCenter.y - massCenter.y)*(darkCenter.y - massCenter.y)))
-            /(sqrt(((eX - sX))*((eX - sX)) + ((eY - sY))*((eY - sY))));
-
-    std::cout << areaDiff - area << "\t";
-    std::cout << areaDiff2 - area2 << "\t";
-    std::cout << massDiff - lengthToCenter << "\t";
-    std::cout << diffCenter << "\t";
-    std::cout << (massDiff - lengthToCenter) + (areaDiff - area) + (areaDiff2 - area2) << "\t";
-    std::cout << (massDiff + areaDiff + areaDiff2)/3 << "\t";
-
-    if(1*(massDiff - lengthToCenter) + 1*(areaDiff - area) + (areaDiff2 - area2) > (massDiff + areaDiff + areaDiff2)/3)
-        closed = true;
-    else
-        closed = false;
-
-    cvReleaseImage(&input);
+    int eX = input->width/4;
+    int eY = input->height/4;
 
     if(avg > 0)
     {
+        double maxMass = mass;
+        for(int i = 0; i < (input->width - eX); i++)
+        {
+            for(int j = 0; j < (input->height - eY); j++)
+            {
+                mass = 0;
+                for(int k = j; k < j + eY; k++)
+                    for(int l = i; l < i + eX; l++)
+                    {
+                        pixel = cvGetAt(input,k,l);
+                        if(pixel.val[0] != 255)
+                            mass++;
+                    }
+                if(mass > maxMass)
+                {
+                    massCenter = cvPoint(i,j); //std::cout << massCenter.x << "," << massCenter.y << ", " << mass << ",   " << input->width << "," <<input->height << std::endl;
+                    maxMass = mass;
+                }
+            }
+        }
+
         if(avg == 1)
         {
-            massDiff = (lengthToCenter + massDiff)/10;
-            areaDiff = (area + areaDiff)/10;
-            areaDiff2 = (areaDiff2 + area2)/10;
-            massCenter.x = massCenter.x/10;
-            massCenter.y = massCenter.y/10;
-
-            std::cout << "Start! " << std::endl << massDiff << "\t" << areaDiff << "\t" << areaDiff2;
+            avgCenter = cvPoint((massCenter.x + avgCenter.x)/samples, (massCenter.y + avgCenter.y)/samples);
+            avgMass = (avgMass + maxMass)/samples;
         }
         else
         {
-            massCenter.x += darkCenter.x;
-            massCenter.y += darkCenter.y;
-            massDiff += lengthToCenter;
-            areaDiff += area;
-            areaDiff2 += area2;
+            avgCenter = cvPoint(massCenter.x + avgCenter.x, massCenter.y + avgCenter.y);
+            avgMass += maxMass;
         }
 
         avg--;
+        return false;
     }
+    else
+    {
+        double area = 0;
 
-    return closed;
+        eY = std::min(eY,input->height - avgCenter.y);
+        eX = std::min(eX, input->width - avgCenter.x);
+
+        for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
+            for(int l = avgCenter.x; l < avgCenter.x + eX; l++)
+            {
+                pixel = cvGetAt(input,k,l);
+                area++;
+                if(pixel.val[0] != 255)
+                    mass++;
+            }
+
+        //std::cout << avgCenter.x << "," << avgCenter.y << "\t";
+        std::cout << avgMass/area << "\t" << mass/area << "\t";
+        std::cout << (avgMass/area - mass/area)/(avgMass/area) << "\t";
+
+        if((avgMass/area - mass/area)/(avgMass/area) > 0.8)
+            closed = true;
+        else
+            closed = false;
+
+        cvReleaseImage(&input);
+
+        return closed;
+    }
 }
 
 int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
