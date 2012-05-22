@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
         }
     }
     else
-        VC.InitAVI(argv[2]);
+        VC.InitAVI(argv[1]);
 
   /*  for(int i = 0; i < 10; i++){
         d1.timeStamp = (double) gettimeofday(&stop, NULL);
