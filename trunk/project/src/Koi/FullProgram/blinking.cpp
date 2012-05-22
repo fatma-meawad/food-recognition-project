@@ -20,7 +20,7 @@ bool CalcPixels(IplImage * inputImage)
     input = Preprocessing::MakeGrayscale(inputImage);
 
     int linesX = 0;
-    int area = 0;
+    double area = 0;
     double area2 = 0;
     CvPoint darkCenter = cvPoint(0,0);
     double lengthToCenter;
@@ -68,6 +68,7 @@ bool CalcPixels(IplImage * inputImage)
                 area2++;
         }
 
+    area = area/((eY - sY)*(eX - sX));
     area2 = area2/((eY2 - sY2)*(eX2 - sX2));
 
     lengthToCenter = (sqrt((darkCenter.x - (sX + eX)/2)*(darkCenter.x - (sX + eX)/2) + (darkCenter.y - (sY + eY)/2)*(darkCenter.y - (sY + eY)/2)))
@@ -76,13 +77,14 @@ bool CalcPixels(IplImage * inputImage)
     double diffCenter = (sqrt((darkCenter.x - massCenter.x)*(darkCenter.x - massCenter.x) + (darkCenter.y - massCenter.y)*(darkCenter.y - massCenter.y)))
             /(sqrt(((eX - sX))*((eX - sX)) + ((eY - sY))*((eY - sY))));
 
-    //std::cout << (massDiff - lengthToCenter) << "\t" << (areaDiff - (double)area/((eX - sX)*(eY - sY))) << "\t" << (areaDiff2 - area2) << "\t";
-    std::cout << (massDiff - lengthToCenter) + (areaDiff - (double)area/((eX - sX)*(eY - sY))) + (areaDiff2 - area2) << "\t"
-              << (massDiff + areaDiff + areaDiff2)/3 << "\t";
+    std::cout << areaDiff - area << "\t";
+    std::cout << areaDiff2 - area2 << "\t";
+    std::cout << massDiff - lengthToCenter << "\t";
+    std::cout << diffCenter << "\t";
+    std::cout << (massDiff - lengthToCenter) + (areaDiff - area) + (areaDiff2 - area2) << "\t";
+    std::cout << (massDiff + areaDiff + areaDiff2)/3 << "\t";
 
-    std::cout << "Center: " << massCenter.x << ", " << massCenter.y << "\t" << diffCenter << "\t";
-
-    if((massDiff - lengthToCenter) + (areaDiff - (double)area/((eX - sX)*(eY - sY))) + (areaDiff2 - area2) > (massDiff + areaDiff + areaDiff2)/3)
+    if(1*(massDiff - lengthToCenter) + 1*(areaDiff - area) + (areaDiff2 - area2) > (massDiff + areaDiff + areaDiff2)/3)
         closed = true;
     else
         closed = false;
@@ -94,7 +96,7 @@ bool CalcPixels(IplImage * inputImage)
         if(avg == 1)
         {
             massDiff = (lengthToCenter + massDiff)/10;
-            areaDiff = ((double)area/((eX - sX)*(eY - sY)) + areaDiff)/10;
+            areaDiff = (area + areaDiff)/10;
             areaDiff2 = (areaDiff2 + area2)/10;
             massCenter.x = massCenter.x/10;
             massCenter.y = massCenter.y/10;
@@ -106,7 +108,7 @@ bool CalcPixels(IplImage * inputImage)
             massCenter.x += darkCenter.x;
             massCenter.y += darkCenter.y;
             massDiff += lengthToCenter;
-            areaDiff += (double)area/((eX - sX)*(eY - sY));
+            areaDiff += area;
             areaDiff2 += area2;
         }
 
