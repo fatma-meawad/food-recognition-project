@@ -67,7 +67,7 @@ bool CalcPixels(IplImage * inputImage)
 
         vector<CvPoint> blackPixels;
 
-        for(int i = 0; i < input->width; i++)
+        /*for(int i = 0; i < input->width; i++)
         {
             for(int j = 0; j < input->height; j++)
             {
@@ -75,7 +75,15 @@ bool CalcPixels(IplImage * inputImage)
                 if(pixel.val[0] != 255)
                     blackPixels.push_back(cvPoint(i,j));
             }
-        }
+        }*/
+
+        for(int k = massCenter.y; k < massCenter.y + eY; k++)
+                    for(int l = massCenter.x; l < massCenter.x + eX; l++)
+                    {
+                        pixel = cvGetAt(input,k,l);
+                        if(pixel.val[0] != 255)
+                            blackPixels.push_back(cvPoint(l,k));
+                    }
 
         double avgLen = 0;
         if(blackPixels.size())
@@ -99,6 +107,8 @@ bool CalcPixels(IplImage * inputImage)
             }
             avgLen = avgLen/blackPixels.size();
         }
+        else
+            std::cout << "EMPTY" << "\t";
 
         if(avg == 1)
         {
@@ -134,7 +144,7 @@ bool CalcPixels(IplImage * inputImage)
 
         vector<CvPoint> blackPixels;
 
-        for(int i = 0; i < input->width; i++)
+        /*for(int i = 0; i < input->width; i++)
         {
             for(int j = 0; j < input->height; j++)
             {
@@ -142,15 +152,15 @@ bool CalcPixels(IplImage * inputImage)
                 if(pixel.val[0] != 255)
                     blackPixels.push_back(cvPoint(i,j));
             }
-        }
+        }*/
 
-        /*for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
+        for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
             for(int l = avgCenter.x; l < avgCenter.x + eX; l++)
             {
                 pixel = cvGetAt(input,k,l);
                 if(pixel.val[0] != 255)
                     blackPixels.push_back(cvPoint(l,k));
-            }*/
+            }
 
         if(blackPixels.size())
         {
