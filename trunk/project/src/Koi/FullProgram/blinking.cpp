@@ -162,6 +162,7 @@ bool CalcPixels(IplImage * inputImage)
                     blackPixels.push_back(cvPoint(l,k));
             }
 
+        double avgLen = 0;
         if(blackPixels.size())
         {
 
@@ -177,7 +178,6 @@ bool CalcPixels(IplImage * inputImage)
             avgY = avgY/blackPixels.size();
 
             // Calculate average distance to from dark pixel to center
-            double avgLen = 0;
             for(unsigned int i = 0; i < blackPixels.size(); i++)
             {
                 avgLen += sqrt((avgX - blackPixels.at(i).x)*(avgX - blackPixels.at(i).x) + (avgY - blackPixels.at(i).y)*(avgY - blackPixels.at(i).y));
@@ -187,13 +187,17 @@ bool CalcPixels(IplImage * inputImage)
             std::cout << "Len: " << (openLen - avgLen)/openLen << "\t";
         }
         else
+        {
             std::cout << "EMPTY!" << "\t";
+            return true;
+        }
 
         //std::cout << avgCenter.x << "," << avgCenter.y << "\t";
         //std::cout << avgMass/area << "\t" << mass/area << "\t";
         std::cout << (avgMass/area - mass/area)/(avgMass/area) << "\t";
+        std::cout << (avgMass/area - mass/area)/(avgMass/area) + (openLen - avgLen)/openLen << "\t";
 
-        if((avgMass/area - mass/area)/(avgMass/area) > 0.8)
+        if((avgMass/area - mass/area)/(avgMass/area) +(openLen - avgLen)/openLen > 0.8)
             closed = true;
         else
             closed = false;
