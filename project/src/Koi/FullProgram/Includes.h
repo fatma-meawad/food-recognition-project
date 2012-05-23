@@ -17,6 +17,7 @@
 #include <sys/time.h>
  #include <QDebug>
  #include <QtGui/QImageReader>
+#include <vector>
 
 
 #include "blinking.h"

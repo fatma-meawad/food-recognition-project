@@ -25,7 +25,8 @@ SOURCES += main.cpp \
     pulse.cpp \
     preprocessing.cpp \
     painting.cpp \
-    facefeatures.cpp
+    facefeatures.cpp \
+    blinkfreq.cpp
 
 
 
@@ -48,6 +49,7 @@ HEADERS += \
     pulse.h \
     preprocessing.h \
     painting.h \
-    facefeatures.h
+    facefeatures.h \
+    blinkfreq.h
 
 
