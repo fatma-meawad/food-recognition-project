@@ -40,28 +40,20 @@ int Pulse::pulseValue(IplImage* img, Facefeatures* face){
     return redness;
 }
 
+/*
+ÄNDRINGAR I MAIN FÖR PROGRAMMET
 
-/*ÄNDRINGAR I MAIN FÖR PROGRAMMET
+int redvalLen=100;
 
-    int redvalLen=100;
-    int vals[100];
-    int pos=0;
 
-    if(redvalLen==100){
-                for (redvalLen=0;redvalLen<100;redvalLen++)
-                    printf("Value of nr %d is %d",redvalLen,vals[redvalLen]);
-                img=cvCreateImage(cvSize(1400,800),IPL_DEPTH_8U,VC.CurrentFrame->nChannels);
-                cvZero(img);
-                cvNot(img,img);
-                redvalLen=0;
-            }
-            vals[redvalLen]=p.pulseValue(VC.CurrentFrame,pFace);
-            //avg[pos]=p.pulseValue(VC.CurrentFrame,pFace);
-            pos++;
-            redvalLen++;
-            paint.drawCircle(img,cvPoint(redvalLen*12,(800-p.pulseValue(VC.CurrentFrame,pFace))),2,-1);
-            if (pos==3){
-                pos =0;
-                }
+if(redvalLen==100){
+    img=cvCreateImage(cvSize(1400,800),IPL_DEPTH_8U,VC.CurrentFrame->nChannels);
+    cvZero(img);
+    cvNot(img,img);
+    redvalLen=0;
+}
+redvalLen++;
+paint.drawCircle(img,cvPoint(redvalLen*12,(800-p.pulseValue(VC.CurrentFrame,pFace))),2,-1);
 
-            cvShowImage("Fake graf",img);*/
+cvShowImage("Fake graf",img);
+*/

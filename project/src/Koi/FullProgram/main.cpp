@@ -9,16 +9,17 @@ int main(int argc, char *argv[])
     Facefeatures old_face;
     old_face.mFace.x=-1;   // säger att old_face inte är användbar;
     pFace = &face;
-
+    int redvalLen=100;
+    IplImage* img;
     Featuredetection f;
-
+    Breathing Breath;
     Painting paint;
     Data d1;
 
     timeval start, stop;
 
 
-//    qDebug() << QImageReader::supportedImageFormats();
+    //    qDebug() << QImageReader::supportedImageFormats();
 
     if(argc == 1)
     {
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
     else
         VC.InitAVI(argv[1]);
 
-  /*  for(int i = 0; i < 10; i++){
+    /*  for(int i = 0; i < 10; i++){
         d1.timeStamp = (double) gettimeofday(&stop, NULL);
         d1.blinkingfreq =  (int)gettimeofday(&stop, NULL)/123;
         d1.breathingfreq = i+1;
@@ -62,6 +63,16 @@ int main(int argc, char *argv[])
         {
             old_face=*pFace;
 
+            if(redvalLen==100){                                                                                     //plotting grapg
+                img=cvCreateImage(cvSize(1400,800),IPL_DEPTH_8U,VC.CurrentFrame->nChannels);
+                cvZero(img);
+                cvNot(img,img);
+                redvalLen=0;
+            }
+            redvalLen++;
+            paint.drawCircle(img,cvPoint(redvalLen*12,(Breath.isBreathing(VC.CurrentFrame,pFace)+2)*200),2,-1);
+            cvShowImage("Fake graf",img);                                                                              //finished plotting graph
+
             Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 
             paint.drawFullFace(VC.CurrentFrame,&old_face);  // Paint test
@@ -74,12 +85,12 @@ int main(int argc, char *argv[])
 
 
 
-         //paint.drawGraph();
-         cvShowImage("asd",VC.CurrentFrame);
-         cvMoveWindow("asd", 700, 200);
+        //paint.drawGraph();
+        cvShowImage("asd",VC.CurrentFrame);
+        cvMoveWindow("asd", 700, 200);
 
-         // Free memory
-         cvReleaseImage(&VC.CurrentFrame);
+        // Free memory
+        cvReleaseImage(&VC.CurrentFrame);
 
         if(cvWaitKey(1) == 27)
             break;
