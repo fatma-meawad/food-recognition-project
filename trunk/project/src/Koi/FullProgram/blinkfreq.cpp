@@ -49,7 +49,7 @@ int blinkfreq::Analyze()
     if(this->EndTime.tv_sec - this->StartTime.tv_sec > 60)
         return flanks/120;
 
-    return flanks / (this->EndTime.tv_sec - this->StartTime.tv_sec);
+    return flanks / (2 * (this->EndTime.tv_sec - this->StartTime.tv_sec));
 
     return -1;
 }
