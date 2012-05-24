@@ -3,6 +3,7 @@
 #define samples 10
 
 int avg = samples;
+double avgArea = 0;
 double avgMass = 0;
 double openLen = 0;
 CvPoint avgCenter = cvPoint(0,0);
@@ -15,7 +16,7 @@ int Blinking::Init()
 bool CalcPixels(IplImage * inputImage)
 {
     CvScalar pixel;
-    IplImage * input;// = cvCreateImage(cvSize(inputImage->width,inputImage->height),IPL_DEPTH_8U,inputImage->nChannels);
+    IplImage * input;
     input = Preprocessing::MakeGrayscale(inputImage);
 
     double mass = 0;
@@ -115,12 +116,14 @@ bool CalcPixels(IplImage * inputImage)
             avgCenter = cvPoint((massCenter.x + avgCenter.x)/samples, (massCenter.y + avgCenter.y)/samples);
             avgMass = (avgMass + maxMass)/samples;
             openLen = (openLen + avgLen)/samples;
+            avgArea = (avgArea + (eX*eY))/samples;
         }
         else
         {
             avgCenter = cvPoint(massCenter.x + avgCenter.x, massCenter.y + avgCenter.y);
             avgMass += maxMass;
             openLen += avgLen;
+            avgArea += (eX*eY);
         }
 
         avg--;
@@ -194,6 +197,7 @@ bool CalcPixels(IplImage * inputImage)
 
         //std::cout << avgCenter.x << "," << avgCenter.y << "\t";
         //std::cout << avgMass/area << "\t" << mass/area << "\t";
+        std::cout << avgArea/area << "\t";
         std::cout << (avgMass/area - mass/area)/(avgMass/area) << "\t";
         std::cout << (avgMass/area - mass/area)/(avgMass/area) + (openLen - avgLen)/openLen << "\t";
 
