@@ -63,15 +63,16 @@ int main(int argc, char *argv[])
         {
             old_face=*pFace;
 
-            if(redvalLen==100){                                                                                     //plotting grapg
+            /*if(redvalLen==100){                                                                                     //plotting grapg
                 img=cvCreateImage(cvSize(1400,800),IPL_DEPTH_8U,VC.CurrentFrame->nChannels);
                 cvZero(img);
                 cvNot(img,img);
                 redvalLen=0;
             }
             redvalLen++;
-            paint.drawCircle(img,cvPoint(redvalLen*12,(Breath.isBreathing(VC.CurrentFrame,pFace)+2)*200),2,-1);
-            cvShowImage("Fake graf",img);                                                                              //finished plotting graph
+            //paint.drawCircle(img,cvPoint(redvalLen*12,(Breath.isBreathing(VC.CurrentFrame,pFace)+2)*200),2,-1);
+            //cvShowImage("Fake graf",img);                                                                              //finished plotting graph
+*/
 
             Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 

@@ -53,7 +53,7 @@ bool CalcPixels(IplImage * inputImage)
                     }
                 if(mass > maxMass)
                 {
-                    massCenter = cvPoint(i,j); //std::cout << massCenter.x << "," << massCenter.y << ", " << mass << ",   " << input->width << "," <<input->height << std::endl;
+                    massCenter = cvPoint(i,j);
                     maxMass = mass;
                 }
 
@@ -136,15 +136,6 @@ bool CalcPixels(IplImage * inputImage)
         eY = std::min(eY,input->height - avgCenter.y);
         eX = std::min(eX, input->width - avgCenter.x);
 
-        for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
-            for(int l = avgCenter.x; l < avgCenter.x + eX; l++)
-            {
-                pixel = cvGetAt(input,k,l);
-                area++;
-                if(pixel.val[0] != 255)
-                    mass++;
-            }
-
         vector<CvPoint> blackPixels;
 
         /*for(int i = 0; i < input->width; i++)
@@ -187,7 +178,12 @@ bool CalcPixels(IplImage * inputImage)
             }
             avgLen = avgLen/blackPixels.size();
 
-            std::cout << "Len: " << (openLen - avgLen)/openLen << "\t";
+            std::cout << "Dist X, Y: " << avgCenter.x + eX/2 - avgX << ", " << avgCenter.y + eY/2 - avgY << "\t";
+
+            if(avgCenter.x + eX/2 - avgX < -1)
+                avgCenter.x += abs(avgCenter.x + eX/2 - avgX);
+            else if(avgCenter.x + eX/2 - avgX > 1)
+                avgCenter.x -= abs(avgCenter.x + eX/2 - avgX);
         }
         else
         {
@@ -195,11 +191,28 @@ bool CalcPixels(IplImage * inputImage)
             return true;
         }
 
+        eY = std::min(eY,input->height - avgCenter.y);
+        eX = std::min(eX, input->width - avgCenter.x);
+
+        for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
+            for(int l = avgCenter.x; l < avgCenter.x + eX; l++)
+            {
+                pixel = cvGetAt(input,k,l);
+                area++;
+                if(pixel.val[0] != 255)
+                    mass++;
+            }
+
         //std::cout << avgCenter.x << "," << avgCenter.y << "\t";
         //std::cout << avgMass/area << "\t" << mass/area << "\t";
-        std::cout << avgArea/area << "\t";
+        //std::cout << avgArea/area << "\t";
+        std::cout << (openLen - avgLen)/openLen << "\t";
         std::cout << (avgMass/area - mass/area)/(avgMass/area) << "\t";
         std::cout << (avgMass/area - mass/area)/(avgMass/area) + (openLen - avgLen)/openLen << "\t";
+
+
+        Painting::drawRect(input, cvRect(avgCenter.x,avgCenter.y, eX, eY));
+        cvShowImage("Behold", input);
 
         if((avgMass/area - mass/area)/(avgMass/area) +(openLen - avgLen)/openLen > 0.8)
             closed = true;
