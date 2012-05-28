@@ -23,8 +23,8 @@ bool CalcPixels(IplImage * inputImage)
     bool closed;
     CvPoint massCenter = cvPoint(0,0);
 
-    int eX = input->width/4;
-    int eY = input->height/4;
+    int eX = input->width/2;
+    int eY = input->height/5;
 
     if(avg > 0)
     {
@@ -67,16 +67,6 @@ bool CalcPixels(IplImage * inputImage)
         }
 
         vector<CvPoint> blackPixels;
-
-        /*for(int i = 0; i < input->width; i++)
-        {
-            for(int j = 0; j < input->height; j++)
-            {
-                pixel = cvGetAt(input,j,i);
-                if(pixel.val[0] != 255)
-                    blackPixels.push_back(cvPoint(i,j));
-            }
-        }*/
 
         for(int k = massCenter.y; k < massCenter.y + eY; k++)
                     for(int l = massCenter.x; l < massCenter.x + eX; l++)
@@ -138,16 +128,6 @@ bool CalcPixels(IplImage * inputImage)
 
         vector<CvPoint> blackPixels;
 
-        /*for(int i = 0; i < input->width; i++)
-        {
-            for(int j = 0; j < input->height; j++)
-            {
-                pixel = cvGetAt(input,j,i);
-                if(pixel.val[0] != 255)
-                    blackPixels.push_back(cvPoint(i,j));
-            }
-        }*/
-
         for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
             for(int l = avgCenter.x; l < avgCenter.x + eX; l++)
             {
@@ -184,6 +164,11 @@ bool CalcPixels(IplImage * inputImage)
                 avgCenter.x += abs(avgCenter.x + eX/2 - avgX);
             else if(avgCenter.x + eX/2 - avgX > 1)
                 avgCenter.x -= abs(avgCenter.x + eX/2 - avgX);
+
+            if(avgCenter.y + eY/2 - avgY < -1)
+                avgCenter.y += abs(avgCenter.y + eY/2 - avgY);
+            else if(avgCenter.y + eY/2 - avgY > 1)
+                avgCenter.y -= abs(avgCenter.y + eY/2 - avgY);
         }
         else
         {
@@ -214,7 +199,7 @@ bool CalcPixels(IplImage * inputImage)
         Painting::drawRect(input, cvRect(avgCenter.x,avgCenter.y, eX, eY));
         cvShowImage("Behold", input);
 
-        if((avgMass/area - mass/area)/(avgMass/area) +(openLen - avgLen)/openLen > 0.8)
+        if((avgMass/area - mass/area)/(avgMass/area) +(openLen - avgLen)/openLen > 0.95)
             closed = true;
         else
             closed = false;
@@ -241,7 +226,6 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
         else
             std::cout  << "Right Open!!!" << std::endl;
 
-        //cin.get();
         cvShowImage("Eye",Preprocessing::MakeGrayscale(Preprocessing::Crop(REImage,inputimage)));
         cvMoveWindow("Eye", 500, 50);
     }
