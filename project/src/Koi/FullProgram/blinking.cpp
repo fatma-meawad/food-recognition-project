@@ -5,6 +5,8 @@
 int avg = samples;
 double avgArea = 0;
 double avgMass = 0;
+double avgAreaW = 0;
+double avgMassW = 0;
 double openLen = 0;
 CvPoint avgCenter = cvPoint(0,0);
 
@@ -17,14 +19,24 @@ bool CalcPixels(IplImage * inputImage)
 {
     CvScalar pixel;
     IplImage * input;
+    IplImage * dito = cvCreateImage(cvSize(inputImage->width,inputImage->height),IPL_DEPTH_8U,inputImage->nChannels);
+    cvCopy(inputImage, dito);
+
+    cvShowImage("Origin",inputImage);
+
     input = Preprocessing::MakeGrayscale(inputImage);
+    IplImage * Thresh = cvCreateImage(cvSize(inputImage->width,inputImage->height),IPL_DEPTH_8U,1);
+    cvCopy(input, Thresh);
+    Thresh = Painting::drawCircle(Thresh,cvPoint(0, Thresh->height/2),-1,-1);
+    Thresh = Preprocessing::MakeThreshold(Thresh,5);
+    input = Preprocessing::MakeThreshold(input, 225);
 
     double mass = 0;
     bool closed;
     CvPoint massCenter = cvPoint(0,0);
 
-    int eX = input->width/2;
-    int eY = input->height/5;
+    int eX = input->width/1.5;
+    int eY = input->height/3;
 
     if(avg > 0)
     {
@@ -101,12 +113,25 @@ bool CalcPixels(IplImage * inputImage)
         else
             std::cout << "EMPTY" << "\t";
 
+        double massW = 0;
+        double areaW = 0;
+
+        for(int k = massCenter.y; k < massCenter.y + eY; k++)
+            for(int l = massCenter.x; l < massCenter.x + eX; l++)
+            {
+                pixel = cvGetAt(Thresh,k,l);
+                areaW++;
+                if(pixel.val[0] == 255)
+                    massW++;
+            }
+
         if(avg == 1)
         {
             avgCenter = cvPoint((massCenter.x + avgCenter.x)/samples, (massCenter.y + avgCenter.y)/samples);
             avgMass = (avgMass + maxMass)/samples;
             openLen = (openLen + avgLen)/samples;
             avgArea = (avgArea + (eX*eY))/samples;
+            avgMassW = (massW + avgMassW)/samples;
         }
         else
         {
@@ -114,6 +139,7 @@ bool CalcPixels(IplImage * inputImage)
             avgMass += maxMass;
             openLen += avgLen;
             avgArea += (eX*eY);
+            avgMassW += massW;
         }
 
         avg--;
@@ -160,15 +186,15 @@ bool CalcPixels(IplImage * inputImage)
 
             std::cout << "Dist X, Y: " << avgCenter.x + eX/2 - avgX << ", " << avgCenter.y + eY/2 - avgY << "\t";
 
-            if(avgCenter.x + eX/2 - avgX < -1)
+            /*if(avgCenter.x + eX/2 - avgX < -1 && input->width > avgCenter.x + eX/2 - avgX + avgCenter.x)
                 avgCenter.x += abs(avgCenter.x + eX/2 - avgX);
-            else if(avgCenter.x + eX/2 - avgX > 1)
+            else if(avgCenter.x + eX/2 - avgX > 1 && 0 < avgCenter.x + eX/2 - avgX - avgCenter.x)
                 avgCenter.x -= abs(avgCenter.x + eX/2 - avgX);
 
-            if(avgCenter.y + eY/2 - avgY < -1)
+            /*if(avgCenter.y + eY/2 - avgY < -1)
                 avgCenter.y += abs(avgCenter.y + eY/2 - avgY);
             else if(avgCenter.y + eY/2 - avgY > 1)
-                avgCenter.y -= abs(avgCenter.y + eY/2 - avgY);
+                avgCenter.y -= abs(avgCenter.y + eY/2 - avgY);*/
         }
         else
         {
@@ -188,18 +214,32 @@ bool CalcPixels(IplImage * inputImage)
                     mass++;
             }
 
+        double massW = 0;
+
+        for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
+            for(int l = avgCenter.x; l < avgCenter.x + eX; l++)
+            {
+                pixel = cvGetAt(Thresh,k,l);
+                if(pixel.val[0] == 255)
+                    massW++;
+            }
+
+        cout << "Area: " << abs(avgMassW/area - massW/area)/(avgMassW/area) << "\t";
+
         //std::cout << avgCenter.x << "," << avgCenter.y << "\t";
         //std::cout << avgMass/area << "\t" << mass/area << "\t";
         //std::cout << avgArea/area << "\t";
         std::cout << (openLen - avgLen)/openLen << "\t";
         std::cout << (avgMass/area - mass/area)/(avgMass/area) << "\t";
-        std::cout << (avgMass/area - mass/area)/(avgMass/area) + (openLen - avgLen)/openLen << "\t";
+        std::cout << (avgMass/area - mass/area)/(avgMass/area) /*+ abs(openLen - avgLen)/openLen*/ + abs(avgMassW/area - massW/area)/(avgMassW/area) << "\t";
 
 
-        Painting::drawRect(input, cvRect(avgCenter.x,avgCenter.y, eX, eY));
-        cvShowImage("Behold", input);
+        Painting::drawRect(dito, cvRect(avgCenter.x,avgCenter.y, eX, eY));
+        cvShowImage("Behold", dito);
+        Painting::drawRect(Thresh,cvRect(avgCenter.x,avgCenter.y, eX, eY));
+        cvShowImage("Mjau", Thresh);
 
-        if((avgMass/area - mass/area)/(avgMass/area) +(openLen - avgLen)/openLen > 0.95)
+        if((avgMass/area - mass/area)/(avgMass/area) + /*abs(openLen - avgLen)/openLen + */ abs(avgMassW/area - massW/area)/(avgMassW/area) > 0.8)
             closed = true;
         else
             closed = false;
