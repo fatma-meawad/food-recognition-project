@@ -79,12 +79,12 @@ bool CalcPixels(IplImage * inputImage)
         }*/
 
         for(int k = massCenter.y; k < massCenter.y + eY; k++)
-                    for(int l = massCenter.x; l < massCenter.x + eX; l++)
-                    {
-                        pixel = cvGetAt(input,k,l);
-                        if(pixel.val[0] != 255)
-                            blackPixels.push_back(cvPoint(l,k));
-                    }
+            for(int l = massCenter.x; l < massCenter.x + eX; l++)
+            {
+                pixel = cvGetAt(input,k,l);
+                if(pixel.val[0] != 255)
+                    blackPixels.push_back(cvPoint(l,k));
+            }
 
         double avgLen = 0;
         if(blackPixels.size())
@@ -208,7 +208,7 @@ bool CalcPixels(IplImage * inputImage)
         //std::cout << avgArea/area << "\t";
         //std::cout << (openLen - avgLen)/openLen << "\t";
         //std::cout << (avgMass/area - mass/area)/(avgMass/area) << "\t";
-        std::cout << (avgMass/area - mass/area)/(avgMass/area) + abs(openLen - avgLen)/openLen << "\t";
+        //std::cout << (avgMass/area - mass/area)/(avgMass/area) + abs(openLen - avgLen)/openLen << "\t";
 
 
         Painting::drawRect(input, cvRect(avgCenter.x,avgCenter.y, eX, eY));
@@ -228,6 +228,7 @@ bool CalcPixels(IplImage * inputImage)
 int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
 {
     CvRect REImage;
+    int closed = -1;
 
     if(righteye.x != -1)
     {
@@ -237,15 +238,21 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
         REImage.height -= Findlowerresize(REImage);
 
         if(CalcPixels(Preprocessing::Crop(REImage,inputimage)))
+        {
+            closed = 1;
             std::cout  << "Right Closed!!!" << std::endl;
+        }
         else
+        {
+            closed = 0;
             std::cout  << "Right Open!!!" << std::endl;
+        }
 
         cvShowImage("Eye",Preprocessing::MakeGrayscale(Preprocessing::Crop(REImage,inputimage)));
         cvMoveWindow("Eye", 500, 50);
     }
 
-    return 1;
+    return closed;
 }
 
 int Blinking::Findlowerresize(CvRect eye)

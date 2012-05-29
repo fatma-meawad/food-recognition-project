@@ -31,12 +31,12 @@ IplImage * Preprocessing::MakeGrayscale(IplImage * Image)
 {    
     IplImage * Gray = cvCreateImage(cvSize(Image->width,Image->height),IPL_DEPTH_8U,1);
     cvCvtColor(Image, Gray, CV_RGB2GRAY);
-    cvShowImage("Gray", Gray);
+    //cvShowImage("Gray", Gray);
     cvEqualizeHist(Gray, Gray);
-    cvShowImage("Equalized", Gray);
+    //cvShowImage("Equalized", Gray);
     cvNot(Gray, Gray);    // Inverter
     cvThreshold(Gray,Gray,225,255,CV_THRESH_BINARY_INV);    // Threshold
-    cvShowImage("Threshold", Gray);
+    //cvShowImage("Threshold", Gray);
 
 
 
