@@ -3,17 +3,17 @@
 
 #include "Includes.h"
 
-class blinkfreq
+class Blinkfreq
 {
-    vector<int> eyestate;
+    std::vector<int> eyestate;
     bool firstadded;
 
     timeval StartTime,EndTime;
 
 public:
-    blinkfreq();
+    Blinkfreq();
     void AddState(int);
-    int Analyze();
+    double Analyze();
 };
 
 #endif // BLINKFREQ_H

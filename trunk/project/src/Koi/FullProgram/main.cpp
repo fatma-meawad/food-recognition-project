@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
     Breathing Breath;
     Painting paint;
     Data d1;
+    Blinkfreq freq;
 
     timeval start, stop;
 
@@ -74,7 +75,9 @@ int main(int argc, char *argv[])
             cvShowImage("Fake graf",img);                                                                              //finished plotting graph
             */
 
-            Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
+            freq.AddState(Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye));
+
+            cout << "Freq: " << freq.Analyze() << endl;
 
             paint.drawFullFace(VC.CurrentFrame,&old_face);  // Paint test
             d1.blinkingfreq = 1000/(((stop.tv_sec - start.tv_sec)* 1000 + (stop.tv_usec - start.tv_usec)/1000.0) + 0.5);

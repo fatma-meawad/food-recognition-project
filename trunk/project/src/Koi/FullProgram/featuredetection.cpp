@@ -109,8 +109,6 @@ int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* oldFace){
                     return 1;
                 }
             }
-            printf("Felaktigt ansikte");
-
         }
     }
 

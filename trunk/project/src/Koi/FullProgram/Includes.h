@@ -30,6 +30,7 @@
 #include "preprocessing.h"
 #include "pulse.h"
 #include "videocapture.h"
+#include "blinkfreq.h"
 
 using namespace std;
 using namespace cv;
