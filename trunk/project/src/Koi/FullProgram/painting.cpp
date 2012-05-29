@@ -15,7 +15,7 @@ IplImage* Painting::drawHairCross(IplImage* img, CvPoint p){
 
 // Draw rectangle
 IplImage* Painting::drawRect(IplImage * img, CvRect rect){
-    cvRectangleR(img,rect,cvScalar(255,0,0), 1);
+    cvRectangleR(img,rect,cvScalar(255,0,0), 5);
 
     return img;
 }
