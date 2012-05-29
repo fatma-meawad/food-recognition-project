@@ -70,9 +70,9 @@ int main(int argc, char *argv[])
                 redvalLen=0;
             }
             redvalLen++;
-            //paint.drawCircle(img,cvPoint(redvalLen*12,(Breath.isBreathing(VC.CurrentFrame,pFace)+2)*200),2,-1);
-            //cvShowImage("Fake graf",img);                                                                              //finished plotting graph
-*/
+            paint.drawCircle(img,cvPoint(redvalLen*12,(Breath.isBreathing(VC.CurrentFrame,pFace)+2)*200),2,-1);
+            cvShowImage("Fake graf",img);                                                                              //finished plotting graph
+            */
 
             Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye);
 

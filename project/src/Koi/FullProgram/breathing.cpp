@@ -7,26 +7,22 @@ Breathing::Breathing()
     this->avg=-1;
 }
 
-IplImage* preprocess(IplImage* img){
+IplImage* preprocess(IplImage* img){     //creates a Image with the contours in the picture
     CvMemStorage* 	g_storage = NULL;
     IplImage* gray;
-    gray = cvCreateImage( cvGetSize( img ), 8, 1 );
+    gray = cvCreateImage( cvGetSize( img ), 8, 1 );  //creates the immage, allocating memory for the pixel values
     g_storage = cvCreateMemStorage(0);
     cvClearMemStorage( g_storage );
     CvSeq* contours = 0;
-
     cvCvtColor( img, gray, CV_BGR2GRAY );
     cvThreshold( gray, gray, 100, 255, CV_THRESH_BINARY );
-    cvFindContours( gray, g_storage, &contours );
-    IplImage* dst = cvCreateImage( cvGetSize(img), 8, 3 );
-    cvZero( dst );
-    if( contours ){
-
-        cvDrawContours(dst,contours,cvScalarAll(255),cvScalarAll(255),100 );
+    cvFindContours( gray, g_storage, &contours );           //find the contours with the thresholdimmage
+    cvZero( gray );
+    if( contours )
+    {
+        cvDrawContours(gray,contours,cvScalarAll(255),cvScalarAll(255),100 ); //paint the contours on immage contours
     }
-
-    return dst;
-
+    return gray;
 }
 
 
@@ -38,71 +34,85 @@ int Breathing::getdistance(IplImage* img, Facefeatures* face){
     IplImage* contour;
     contour=preprocess(img);
     int i=0;
-    //int a;
-    //int b;
-    //int count=0;
     CvScalar pixel;
     CvPoint startpos=cvPoint(face->mFace.x,face->mFace.y+face->mFace.height*1.2);
 
-
-    cvLine(contour, cvPoint(startpos.x-2,startpos.y+40), cvPoint(startpos.x+2,startpos.y+40), cvScalar(255,255,255), 1);
-    while(startpos.y+i<contour->height){
-
-        pixel = cvGetAt(contour,startpos.y+i,startpos.x);
-
-        //cout << cvGetReal2D(contour,startpos.x,startpos.y+i)     << " i " << i << " y " << startpos.y << endl;
-        //cout << pixel.val[0] << endl;
-        cout << pixel.val[0]<<" "<<pixel.val[1] << " i " << i << " y " << startpos.y << endl;
-        if(pixel.val[0]>100 )
+    while(startpos.y+i<contour->height)  //while the position is in the picture
+    {
+        pixel = cvGetAt(contour,startpos.y+i,startpos.x);        //get value of pixel
+        //cout << pixel.val[0]<<" "<<pixel.val[1] << " i " << i << " y " << startpos.y << endl;
+        if(pixel.val[0]>100 )               // if pixel is black then we found a contour and passes on the position
         {
             break;
         }
-        i++;
-
+        i++;   //otherwise go a pixel down and continue looping
     }
-
-
-    int svar=startpos.y+i;;//-face->mFace.height/2-face->mFace.y;
-    cvLine(contour, cvPoint(startpos.x-10,startpos.y+i), cvPoint(startpos.x+10,startpos.y+i), cvScalar(255,255,255), 1);
-    cvLine(contour, startpos, cvPoint(startpos.x,startpos.y+100), cvScalar(255,255,255), 1);
+    int svar=startpos.y+i;
+    //cvLine(contour, cvPoint(startpos.x-10,startpos.y+i), cvPoint(startpos.x+10,startpos.y+i), cvScalar(255,255,255), 1);
+    cvLine(contour, startpos, cvPoint(startpos.x,startpos.y+100), cvScalar(255,255,255), 1);        //information lines to see the positions it searches at
     cvShowImage( "Contours", contour );
     cvReleaseImage(&contour);
-    return svar;
-
+    return svar;    //return the position of the picture
 }
 
-int Breathing::isBreathing(IplImage* img, Facefeatures* face){
+int Breathing::isBreathing(IplImage* img, Facefeatures* face) //returns a binary value 0=bellow or 1=above for valid outputs, -1 if undefined
+{
     int b;
-    int a = getdistance(img,face);
-    if (this->pos<200){
+    int a = getdistance(img,face);  // the position returned by the function above
+    if (this->pos<200) // lower then 200 means that the list hasnt become full yet
+    {
         this->list[this->pos]=a;
         this->pos++;
-        return -1;
-    }else{
-        if(this->pos==400){
-            this->pos-=200;
+        return -1;  //add the value to the list and return -1 as in not long enough list for comparison
+    }
+    else //list is full
+    {
+        if(this->pos==400)  //the end of the list
+        {
+            this->pos-=200; //go back to the start
         }
-        b=this->list[this->pos-200];
-        this->list[this->pos-200]=a;
-        this->pos++;
+        b=this->list[this->pos-200]; //pick the value that is on the spot that the new value will be added on
+        this->list[this->pos-200]=a;   // place the new value on that spot
+        this->pos++;    //increase the position variable
 
-        if (this->avg==-1){
+        if (this->avg==-1)  //if a avg hasnt been calculated yet then loop threw the list and get the avg value
+        {
             int i;
-            for(i=0;i<200;i++){
+            for(i=0;i<200;i++)
                 this->avg+=this->list[i];
-            }
-        }else{
+        }
+        else    //if avg has been set, then avg subtract the old value in that spot and adds the new value
+        {
             avg=avg-b+a;
         }
-        if (a*200>this->avg){
-            return 0;
-        }else{
+        int val=0;
+        for(int i=0;i<5;i++)
+        {
+            if(this->pos-i<200)
+            {
+                if (this->list[this->pos-i]*200<this->avg)    //if the avg value is bigger then current value then add 1 to val;
+                {
+                    val+=1;
+                }
+            }
+            else
+            {
+                if (this->list[this->pos-i-200]*200<this->avg)    //if the avg value is bigger then current value then add 1 to val;
+                {
+                    val+=1;
+                }
+            }
+
+        }
+        if(val>2)
+        {
             return 1;
+        }
+        else
+        {
+            return 0;
         }
 
     }
-
-
-
 }
 
