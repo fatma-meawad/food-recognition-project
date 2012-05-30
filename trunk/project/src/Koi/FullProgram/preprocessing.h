@@ -16,8 +16,7 @@ public:
     Preprocessing();
 
     static IplImage * MakeGrayscale(IplImage *);
-    static IplImage * MakeEqualized(IplImage *);
-    static IplImage * MakeBinary(IplImage *, int);
+    static IplImage * MakeThreshold(IplImage *, int);
     static IplImage * MakeHSV(IplImage *);
     static IplImage * Crop(CvRect,IplImage*);
     static IplImage * MakeDiffImage(Videocapture VC);
