@@ -9,8 +9,10 @@
 
 class Blinking
 {
+    std::vector<double> filter;
 
 public:
+
     Blinking(){}
     int Init();
     int Analyze(IplImage*, CvRect, CvRect);
