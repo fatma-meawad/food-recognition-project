@@ -13,222 +13,68 @@ int Blinking::Init()
     return 1;
 }
 
-bool CalcPixels(IplImage * inputImage)
+double CalcPixels(IplImage * inputImage)
 {
     CvScalar pixel;
     IplImage * input;
-    input = Preprocessing::MakeGrayscale(inputImage);
+    IplImage * copy = cvCreateImage(cvSize(inputImage->width,inputImage->height),IPL_DEPTH_8U,inputImage->nChannels);
+    IplImage * check = cvCreateImage(cvSize(inputImage->width,inputImage->height),IPL_DEPTH_8U,1);
+    cvCopy(inputImage, copy);
 
-    double mass = 0;
-    bool closed;
-    CvPoint massCenter = cvPoint(0,0);
+    //input = Preprocessing::MakeGrayscale(inputImage);
+    //Preprocessing::MakeEqualized(input);
 
-    int eX = input->width/4;
-    int eY = input->height/4;
+    cvShowImage("Equal", inputImage);
+    //cvMoveWindow("Equal", 200,100);
 
-    if(avg > 0)
+    double i = 0;
+    double max = 0;
+    bool found = false;
+
+    for(; !found; i++)
     {
-        double maxMass = mass;
+        cvCopy(inputImage, check);
+        cvSmooth(check, check, CV_MEDIAN,11);
+        Preprocessing::MakeBinary(check, i);
 
-        for(int i = 0; i < (input->width - eX); i++)
-        {
-            int closeX = input->width;
-
-            for(int j = 0; j < (input->height - eY); j++)
+        for(int y = check->height/3; y < check->height && !found; y++)
+            for(int x = 0; x < check->width && !found; x++)
             {
-                int closeY = input->height;
-                mass = 0;
-                for(int k = j; k < j + eY; k++)
-                    for(int l = i; l < i + eX; l++)
-                    {
-                        pixel = cvGetAt(input,k,l);
-                        if(pixel.val[0] != 255)
-                        {
-                            mass++;
-                            if(l < closeX)
-                                closeX = l;
-                            if(k < closeY)
-                                closeY = k;
-                        }
-                    }
-                if(mass > maxMass)
+                pixel = cvGetAt(check,y,x);
+                if(pixel.val[0] != 255)
                 {
-                    massCenter = cvPoint(i,j);
-                    maxMass = mass;
+                    found = true;
+                    for(int k = 0; k<copy->width; k++)
+                    {
+                        pixel = cvGetAt(copy,y,k);
+                        if(pixel.val[0] + pixel.val[1] + pixel.val[2] > max)
+                            max = pixel.val[0] + pixel.val[1] + pixel.val[2];
+                    }
+                    max = max/(255);
+                    //cout << "Sum: " << max << "\t";
                 }
-
-                if(closeY - 1 > i && closeY != input->height)
-                    i = closeY - 1;
             }
-
-            if(closeX - 1 > i && closeX != input->width)
-                i = closeX - 1;
-
-        }
-
-        vector<CvPoint> blackPixels;
-
-        /*for(int i = 0; i < input->width; i++)
-        {
-            for(int j = 0; j < input->height; j++)
-            {
-                pixel = cvGetAt(input,j,i);
-                if(pixel.val[0] != 255)
-                    blackPixels.push_back(cvPoint(i,j));
-            }
-        }*/
-
-        for(int k = massCenter.y; k < massCenter.y + eY; k++)
-            for(int l = massCenter.x; l < massCenter.x + eX; l++)
-            {
-                pixel = cvGetAt(input,k,l);
-                if(pixel.val[0] != 255)
-                    blackPixels.push_back(cvPoint(l,k));
-            }
-
-        double avgLen = 0;
-        if(blackPixels.size())
-        {
-
-            // Calculate center
-            int avgX = 0;
-            int avgY = 0;
-            for(unsigned int i = 0; i < blackPixels.size(); i++)
-            {
-                avgX += blackPixels.at(i).x;
-                avgY += blackPixels.at(i).y;
-            }
-            avgX = avgX/blackPixels.size();
-            avgY = avgY/blackPixels.size();
-
-            // Calculate average distance to from dark pixel to center
-            for(unsigned int i = 0; i < blackPixels.size(); i++)
-            {
-                avgLen += sqrt((avgX - blackPixels.at(i).x)*(avgX - blackPixels.at(i).x) + (avgY - blackPixels.at(i).y)*(avgY - blackPixels.at(i).y));
-            }
-            avgLen = avgLen/blackPixels.size();
-        }
-        else
-            std::cout << "EMPTY" << "\t";
-
-        if(avg == 1)
-        {
-            avgCenter = cvPoint((massCenter.x + avgCenter.x)/samples, (massCenter.y + avgCenter.y)/samples);
-            avgMass = (avgMass + maxMass)/samples;
-            openLen = (openLen + avgLen)/samples;
-            avgArea = (avgArea + (eX*eY))/samples;
-        }
-        else
-        {
-            avgCenter = cvPoint(massCenter.x + avgCenter.x, massCenter.y + avgCenter.y);
-            avgMass += maxMass;
-            openLen += avgLen;
-            avgArea += (eX*eY);
-        }
-
-        avg--;
-        return false;
     }
-    else
-    {
-        double area = 0;
 
-        eY = std::min(eY,input->height - avgCenter.y);
-        eX = std::min(eX, input->width - avgCenter.x);
-
-        vector<CvPoint> blackPixels;
-
-        /*for(int i = 0; i < input->width; i++)
-        {
-            for(int j = 0; j < input->height; j++)
-            {
-                pixel = cvGetAt(input,j,i);
-                if(pixel.val[0] != 255)
-                    blackPixels.push_back(cvPoint(i,j));
-            }
-        }*/
-
-        for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
-            for(int l = avgCenter.x; l < avgCenter.x + eX; l++)
-            {
-                pixel = cvGetAt(input,k,l);
-                if(pixel.val[0] != 255)
-                    blackPixels.push_back(cvPoint(l,k));
-            }
-
-        double avgLen = 0;
-        if(blackPixels.size())
-        {
-
-            // Calculate center
-            int avgX = 0;
-            int avgY = 0;
-            for(unsigned int i = 0; i < blackPixels.size(); i++)
-            {
-                avgX += blackPixels.at(i).x;
-                avgY += blackPixels.at(i).y;
-            }
-            avgX = avgX/blackPixels.size();
-            avgY = avgY/blackPixels.size();
-
-            // Calculate average distance to from dark pixel to center
-            for(unsigned int i = 0; i < blackPixels.size(); i++)
-            {
-                avgLen += sqrt((avgX - blackPixels.at(i).x)*(avgX - blackPixels.at(i).x) + (avgY - blackPixels.at(i).y)*(avgY - blackPixels.at(i).y));
-            }
-            avgLen = avgLen/blackPixels.size();
-
-            //std::cout << "Dist X, Y: " << avgCenter.x + eX/2 - avgX << ", " << avgCenter.y + eY/2 - avgY << "\t";
-
-            /*if(avgCenter.x + eX/2 - avgX < -1)
-                avgCenter.x += abs(avgCenter.x + eX/2 - avgX);
-            else if(avgCenter.x + eX/2 - avgX > 1)
-                avgCenter.x -= abs(avgCenter.x + eX/2 - avgX);*/
-        }
-        else
-        {
-            std::cout << "EMPTY!" << "\t";
-            return true;
-        }
-
-        eY = std::min(eY,input->height - avgCenter.y);
-        eX = std::min(eX, input->width - avgCenter.x);
-
-        for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
-            for(int l = avgCenter.x; l < avgCenter.x + eX; l++)
-            {
-                pixel = cvGetAt(input,k,l);
-                area++;
-                if(pixel.val[0] != 255)
-                    mass++;
-            }
-
-        //std::cout << avgCenter.x << "," << avgCenter.y << "\t";
-        //std::cout << avgMass/area << "\t" << mass/area << "\t";
-        //std::cout << avgArea/area << "\t";
-        //std::cout << (openLen - avgLen)/openLen << "\t";
-        //std::cout << (avgMass/area - mass/area)/(avgMass/area) << "\t";
-        //std::cout << (avgMass/area - mass/area)/(avgMass/area) + abs(openLen - avgLen)/openLen << "\t";
-
-
-        Painting::drawRect(input, cvRect(avgCenter.x,avgCenter.y, eX, eY));
-        cvShowImage("Behold", input);
-
-        if((avgMass/area - mass/area)/(avgMass/area) +abs(openLen - avgLen)/openLen > 0.8)
-            closed = true;
-        else
-            closed = false;
-
-        cvReleaseImage(&input);
-
-        return closed;
-    }
+    return max;
 }
 
-int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
+int Blinking::Analyze(IplImage* inputImage, CvRect righteye, CvRect lefteye)
 {
-    CvRect REImage;
+    CvRect REImage, LEImage;
     int closed = -1;
+
+    IplImage * copy = cvCreateImage(cvSize(inputImage->width,inputImage->height),IPL_DEPTH_8U,inputImage->nChannels);
+    cvCopy(inputImage, copy);
+
+    copy = Preprocessing::MakeGrayscale(copy);
+    Preprocessing::MakeEqualized(copy);
+
+    timeval start, stop;
+
+    gettimeofday(&start, NULL);
+
+    double left, right = 0;
 
     if(righteye.x != -1)
     {
@@ -237,34 +83,61 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
         REImage.height -= Findupperresize(REImage);
         REImage.height -= Findlowerresize(REImage);
 
-        if(CalcPixels(Preprocessing::Crop(REImage,inputimage)))
-        {
-            closed = 1;
-            std::cout  << "Right Closed!!!" << std::endl;
-        }
-        else
-        {
-            closed = 0;
-            std::cout  << "Right Open!!!" << std::endl;
-        }
-
-        cvShowImage("Eye",Preprocessing::MakeGrayscale(Preprocessing::Crop(REImage,inputimage)));
-        cvMoveWindow("Eye", 500, 50);
+        right = CalcPixels(Preprocessing::Crop(REImage,copy));
     }
+
+    if(lefteye.x != -1)
+    {
+        LEImage = lefteye;
+        LEImage.y += Findupperresize(LEImage);
+        LEImage.height -= Findupperresize(LEImage);
+        LEImage.height -= Findlowerresize(LEImage);
+
+        left = CalcPixels(Preprocessing::Crop(LEImage,copy));
+    }
+
+    gettimeofday(&stop, NULL);
+
+    //cout << "MS: " << (((stop.tv_sec - start.tv_sec)* 1000 + (stop.tv_usec - start.tv_usec)/1000.0) + 0.5);
+
+
+
+    if(filter.size() > 8)
+        filter.erase(filter.begin());
+
+    double avg = 0;
+    for(int i = 0; i<filter.size(); i++)
+    {
+        avg += filter.at(i);
+    }
+    avg = avg/filter.size();
+
+    filter.push_back(left*right);
+
+    //cout << "Quote: " << 1 - avg/(left*right) << "\t";
+
+    if(left*right * (1+(1 - avg/(left*right))) < 0.3)
+    {
+        closed = 1;
+        cout << "CLOSED!!!   " << left*right * (1+(1 - avg/(left*right)))  << endl;
+    }
+    else
+    {
+        closed = 0;
+        cout << "OPEN!!!     " << left*right * (1+(1 - avg/(left*right)))  << endl;
+    }
+
+    cvReleaseImage(&copy);
 
     return closed;
 }
 
 int Blinking::Findlowerresize(CvRect eye)
 {
-    return eye.height / 4;
+    return eye.height / 2;
 }
 
 int Blinking::Findupperresize(CvRect eye)
 {
-    return eye.height / 3;
+    return eye.height / 2.0;
 }
-
-
-
-

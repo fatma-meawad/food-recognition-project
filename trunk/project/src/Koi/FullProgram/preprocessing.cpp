@@ -31,36 +31,29 @@ IplImage * Preprocessing::MakeGrayscale(IplImage * Image)
 {    
     IplImage * Gray = cvCreateImage(cvSize(Image->width,Image->height),IPL_DEPTH_8U,1);
     cvCvtColor(Image, Gray, CV_RGB2GRAY);
-    //cvShowImage("Gray", Gray);
-    cvEqualizeHist(Gray, Gray);
-    //cvShowImage("Equalized", Gray);
-    cvNot(Gray, Gray);    // Inverter
-    cvThreshold(Gray,Gray,225,255,CV_THRESH_BINARY_INV);    // Threshold
-    //cvShowImage("Threshold", Gray);
-
-
-
-    /*CvMemStorage* storage = cvCreateMemStorage(0);
-    cvSmooth(Gray, Gray, CV_GAUSSIAN, 3, 3);
-    CvSeq* circles = cvHoughCircles(Gray, storage, CV_HOUGH_GRADIENT,2, Gray->height, 250, 50, Gray->height/8, Gray->height/1.6);
-
-    std::cout << "Total circles: " << circles->total << std::endl;
-
-    for (int i = 0; i < circles->total; i++)
-        {
-             float* p = (float*)cvGetSeqElem( circles, i );
-             cvCircle( Gray, cvPoint(cvRound(p[0]),cvRound(p[1])),
-                 3, CV_RGB(0,255,0), -1, 8, 0 );
-             cvCircle( Gray, cvPoint(cvRound(p[0]),cvRound(p[1])),
-                 cvRound(p[2]), CV_RGB(255,0,0), 3, 8, 0 );
-        }*/
 
     // Free memory
     cvReleaseImage(&Image);
-    //cvReleaseMemStorage(&storage);
 
     return Gray;
 }
+
+IplImage * Preprocessing::MakeEqualized(IplImage * Image)
+{
+    cvEqualizeHist(Image, Image);
+
+    return Image;
+}
+
+IplImage * Preprocessing::MakeBinary(IplImage * Image, int threshold)
+{
+    //cvNot(Image, Image);
+    cvThreshold(Image,Image,threshold,255,CV_THRESH_BINARY);
+
+    return Image;
+}
+
+
 
 IplImage * Preprocessing::MakeHSV(IplImage * Image)
 {
