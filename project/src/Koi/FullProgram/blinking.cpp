@@ -27,7 +27,7 @@ double CalcPixels(IplImage * inputImage)
     cvShowImage("Equal", inputImage);
     //cvMoveWindow("Equal", 200,100);
 
-    double i = 0;
+    double i = 20;
     double max = 0;
     bool found = false;
 
@@ -55,8 +55,8 @@ double CalcPixels(IplImage * inputImage)
                 }
             }
     }
-
-    return max;
+    //cout << "I: " << i << "\t" << max << "\t";
+    return i;
 }
 
 int Blinking::Analyze(IplImage* inputImage, CvRect righteye, CvRect lefteye)
@@ -102,7 +102,7 @@ int Blinking::Analyze(IplImage* inputImage, CvRect righteye, CvRect lefteye)
 
 
 
-    if(filter.size() > 8)
+    if(filter.size() > 5)
         filter.erase(filter.begin());
 
     double avg = 0;
@@ -114,17 +114,31 @@ int Blinking::Analyze(IplImage* inputImage, CvRect righteye, CvRect lefteye)
 
     filter.push_back(left*right);
 
+    cout << "Left: " << left << "\t"<< "Right: " << right << "\t" << "Product: " << left*right << "\t";
+
     //cout << "Quote: " << 1 - avg/(left*right) << "\t";
 
-    if(left*right * (1+(1 - avg/(left*right))) < 0.3)
+    if(result.size() > 3)
+        result.erase(result.begin());
+
+    double avgR = 0;
+    for(int i = 0; i<result.size(); i++)
+    {
+        avgR += result.at(i);
+    }
+    avgR = avgR/result.size();
+
+    result.push_back(left*right);
+
+    if((left*right)/(avgR) > 1.3)
     {
         closed = 1;
-        cout << "CLOSED!!!   " << left*right * (1+(1 - avg/(left*right)))  << endl;
+        cout << "CLOSED!!!   " << (left*right)/(avgR) << endl;
     }
     else
     {
         closed = 0;
-        cout << "OPEN!!!     " << left*right * (1+(1 - avg/(left*right)))  << endl;
+        cout << "OPEN!!!     " << (left*right)/(avgR)  << endl;
     }
 
     cvReleaseImage(&copy);
