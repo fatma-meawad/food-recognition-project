@@ -8,7 +8,7 @@ class Facefeatures;
 class Pulse
 {
 public:
-    Pulse();
+    Pulse(){}
     int pulseValue(IplImage* img, Facefeatures* face);
 };
 

@@ -51,9 +51,7 @@ CvSeq * Featuredetection::GetFaces(IplImage* img, CvRect* oldFace)  //function t
         cvClearMemStorage(this->storage);
         return faces;
     }
-
 }
-
 
 int Featuredetection::detectface (IplImage* img, CvRect* face, CvRect* oldFace){
     int i;

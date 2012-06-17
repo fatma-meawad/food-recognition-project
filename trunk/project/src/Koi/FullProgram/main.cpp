@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     Facefeatures face;
     Blinking Blinker;
     Facefeatures old_face;
-    old_face.mFace.x=-1;   // säger att old_face inte är användbar;
+    old_face.mFace.x=-1;   // says that there is no old face at start
     pFace = &face;
     int redvalLen=100;
     IplImage* img;
@@ -19,12 +19,8 @@ int main(int argc, char *argv[])
 
     timeval start, stop;
 
-
-    //    qDebug() << QImageReader::supportedImageFormats();
-
     if(argc == 1)
     {
-        //VC.Init(CV_CAP_ANY);
         if(VC.Init(CV_CAP_ANY) < 0)
         {
             return -1;
@@ -34,23 +30,8 @@ int main(int argc, char *argv[])
     else
         VC.InitAVI(argv[1]);
 
-    /*  for(int i = 0; i < 10; i++){
-        d1.timeStamp = (double) gettimeofday(&stop, NULL);
-        d1.blinkingfreq =  (int)gettimeofday(&stop, NULL)/123;
-        d1.breathingfreq = i+1;
-        d1.pulsefreq = i-1;
-
-        paint.mData.push_back();
-    }
-*/
-
     d1.timeStamp = 0;
-    paint.drawInit(&paint);
-
-
-    //cvNamedWindow("asd",CV_WINDOW_AUTOSIZE);
-
-    //cvWaitKey(0);
+    //paint.drawInit(&paint);
 
     while(true)
     {
@@ -64,7 +45,7 @@ int main(int argc, char *argv[])
         {
             old_face=*pFace;
 
-            /*if(redvalLen==100){                                                                                     //plotting grapg
+            if(redvalLen==100){                                                                                     //plotting graph
                 img=cvCreateImage(cvSize(1400,800),IPL_DEPTH_8U,VC.CurrentFrame->nChannels);
                 cvZero(img);
                 cvNot(img,img);
@@ -73,25 +54,17 @@ int main(int argc, char *argv[])
             redvalLen++;
             paint.drawCircle(img,cvPoint(redvalLen*12,(Breath.isBreathing(VC.CurrentFrame,pFace)+2)*200),2,-1);
             cvShowImage("Fake graf",img);                                                                              //finished plotting graph
-            */
 
-            freq.AddState(Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye,old_face.mLeftEye));
 
-            cout << "Freq: " << freq.Analyze() << endl;
+            freq.AddState(Blinker.Analyze(VC.CurrentFrame,old_face.mRightEye));
+
+            //cout << "Freq: " << freq.Analyze() << endl;
 
             paint.drawFullFace(VC.CurrentFrame,&old_face);  // Paint test
-            d1.blinkingfreq = 1000/(((stop.tv_sec - start.tv_sec)* 1000 + (stop.tv_usec - start.tv_usec)/1000.0) + 0.5);
-            d1.timeStamp++;
-            //paint.mData.push_back(d1);
-
         }
 
-
-
-
-        //paint.drawGraph();
         cvShowImage("asd",VC.CurrentFrame);
-        cvMoveWindow("asd", 700, 200);
+        //cvMoveWindow("asd", 700, 200);
 
         // Free memory
         cvReleaseImage(&VC.CurrentFrame);

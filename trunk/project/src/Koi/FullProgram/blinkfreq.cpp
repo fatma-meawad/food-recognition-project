@@ -43,7 +43,6 @@ double Blinkfreq::Analyze()
 
         start++;
         next++;
-
     }
 
     if(this->EndTime.tv_sec - this->StartTime.tv_sec > 60)

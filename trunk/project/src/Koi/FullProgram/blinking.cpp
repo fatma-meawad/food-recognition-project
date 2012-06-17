@@ -2,35 +2,29 @@
 
 #define samples 10
 
+// Average values as reference
 int avg = samples;
 double avgArea = 0;
 double avgMass = 0;
 double openLen = 0;
 CvPoint avgCenter = cvPoint(0,0);
 
-int Blinking::Init()
-{
-    return 1;
-}
-
 bool CalcPixels(IplImage * inputImage)
 {
     CvScalar pixel;
     IplImage * input;
-    input = Preprocessing::MakeGrayscale(inputImage);
-
-    //cvSmooth(input, input,CV_MEDIAN,11);
+    input = Preprocessing::MakeBinary(inputImage);   // Make picture binary before analyzing
 
     cvShowImage("After", input);
-    cvMoveWindow("After", 200, 100);
 
     double mass = 0;
     bool closed;
     CvPoint massCenter = cvPoint(0,0);
 
-    int eX = input->width/4;
-    int eY = input->height/4;
+    int eX = input->width/4;        // Sets size of sub-area to be analyzed
+    int eY = input->height/4;       //              -||-
 
+    // Create average values for
     if(avg > 0)
     {
         double maxMass = mass;
@@ -72,16 +66,6 @@ bool CalcPixels(IplImage * inputImage)
         }
 
         vector<CvPoint> blackPixels;
-
-        /*for(int i = 0; i < input->width; i++)
-        {
-            for(int j = 0; j < input->height; j++)
-            {
-                pixel = cvGetAt(input,j,i);
-                if(pixel.val[0] != 255)
-                    blackPixels.push_back(cvPoint(i,j));
-            }
-        }*/
 
         for(int k = massCenter.y; k < massCenter.y + eY; k++)
             for(int l = massCenter.x; l < massCenter.x + eX; l++)
@@ -132,6 +116,8 @@ bool CalcPixels(IplImage * inputImage)
         }
 
         avg--;
+
+        // Assume open eyes
         return false;
     }
     else
@@ -143,16 +129,7 @@ bool CalcPixels(IplImage * inputImage)
 
         vector<CvPoint> blackPixels;
 
-        /*for(int i = 0; i < input->width; i++)
-        {
-            for(int j = 0; j < input->height; j++)
-            {
-                pixel = cvGetAt(input,j,i);
-                if(pixel.val[0] != 255)
-                    blackPixels.push_back(cvPoint(i,j));
-            }
-        }*/
-
+        // Find all black pixels in sub-area
         for(int k = avgCenter.y; k < avgCenter.y + eY; k++)
             for(int l = avgCenter.x; l < avgCenter.x + eX; l++)
             {
@@ -165,7 +142,7 @@ bool CalcPixels(IplImage * inputImage)
         if(blackPixels.size())
         {
 
-            // Calculate center
+            // Calculate center of black pixels
             int avgX = 0;
             int avgY = 0;
             for(unsigned int i = 0; i < blackPixels.size(); i++)
@@ -182,13 +159,6 @@ bool CalcPixels(IplImage * inputImage)
                 avgLen += sqrt((avgX - blackPixels.at(i).x)*(avgX - blackPixels.at(i).x) + (avgY - blackPixels.at(i).y)*(avgY - blackPixels.at(i).y));
             }
             avgLen = avgLen/blackPixels.size();
-
-            //std::cout << "Dist X, Y: " << avgCenter.x + eX/2 - avgX << ", " << avgCenter.y + eY/2 - avgY << "\t";
-
-            /*if(avgCenter.x + eX/2 - avgX < -1)
-                avgCenter.x += abs(avgCenter.x + eX/2 - avgX);
-            else if(avgCenter.x + eX/2 - avgX > 1)
-                avgCenter.x -= abs(avgCenter.x + eX/2 - avgX);*/
         }
         else
         {
@@ -208,13 +178,7 @@ bool CalcPixels(IplImage * inputImage)
                     mass++;
             }
 
-        //std::cout << avgCenter.x << "," << avgCenter.y << "\t";
-        //std::cout << avgMass/area << "\t" << mass/area << "\t";
-        //std::cout << avgArea/area << "\t";
-        //std::cout << (openLen - avgLen)/openLen << "\t";
-        //std::cout << (avgMass/area - mass/area)/(avgMass/area) << "\t";
-        //std::cout << (avgMass/area - mass/area)/(avgMass/area) + abs(openLen - avgLen)/openLen << "\t";
-
+        // If average mass and average "density" is high enough, consider eyes closed
         if((avgMass/area - mass/area)/(avgMass/area) +abs(openLen - avgLen)/openLen > 0.8)
             closed = true;
         else
@@ -226,18 +190,21 @@ bool CalcPixels(IplImage * inputImage)
     }
 }
 
-int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
+// Analyze image, determine whether eye is closed or not
+int Blinking::Analyze(IplImage* inputimage, CvRect righteye)
 {
     CvRect REImage;
     int closed = -1;
 
+    // If there exists a right eye, then analyze the eye
     if(righteye.x != -1)
     {
         REImage = righteye;
-        REImage.y += Findupperresize(REImage);
-        REImage.height -= Findupperresize(REImage);
-        REImage.height -= Findlowerresize(REImage);
+        REImage.y += FindUpperResize(REImage);
+        REImage.height -= FindUpperResize(REImage);
+        REImage.height -= FindLowerResize(REImage);
 
+        // Analyze cropped image
         if(CalcPixels(Preprocessing::Crop(REImage,inputimage)))
         {
             closed = 1;
@@ -249,19 +216,19 @@ int Blinking::Analyze(IplImage* inputimage, CvRect righteye, CvRect lefteye)
             std::cout  << "Right Open!!!" << std::endl;
         }
 
-        cvShowImage("Eye",Preprocessing::MakeGrayscale(Preprocessing::Crop(REImage,inputimage)));
-        cvMoveWindow("Eye", 500, 50);
+        // Show cropped Eye-frame
+        cvShowImage("Eye",Preprocessing::MakeBinary(Preprocessing::Crop(REImage,inputimage)));
     }
 
     return closed;
 }
 
-int Blinking::Findlowerresize(CvRect eye)
+int Blinking::FindLowerResize(CvRect eye)
 {
     return eye.height / 4;
 }
 
-int Blinking::Findupperresize(CvRect eye)
+int Blinking::FindUpperResize(CvRect eye)
 {
     return eye.height / 3;
 }
