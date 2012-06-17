@@ -1,8 +1,5 @@
 #include "pulse.h"
 
-Pulse::Pulse()
-{
-}
 int Pulse::pulseValue(IplImage* img, Facefeatures* face){
     Preprocessing p;
     int i;
@@ -21,7 +18,7 @@ int Pulse::pulseValue(IplImage* img, Facefeatures* face){
             redness+=pixel.val[0]*100;
         }
     }
-    //cvShowImage("test1", img);
+    //cvShowImage("Test 1", img);
     cvResetImageROI(bild);
     test=cvRect(face->mLeftEye.x+face->mLeftEye.width-face->mLeftEye.width*3.5/10-face->mLeftEye.width*3/10,face->mLeftEye.y+face->mLeftEye.height*9/10,face->mRightEye.width*3.5/10,face->mRightEye.height*7/10);
     cvSetImageROI(bild,test);
@@ -33,7 +30,7 @@ int Pulse::pulseValue(IplImage* img, Facefeatures* face){
             redness+=pixel.val[0]*100;
         }
     }
-    //cvShowImage("test2", img);
+    //cvShowImage("Test 2", img);
     redness=redness/(bild->roi->width*bild->roi->height*2);
     cvResetImageROI(bild);
     printf("Redness: %d\n",redness);
@@ -41,7 +38,7 @@ int Pulse::pulseValue(IplImage* img, Facefeatures* face){
 }
 
 /*
-ÄNDRINGAR I MAIN FÖR PROGRAMMET
+CHANGES IN MAIN IN ORDER TO RUN
 
 int redvalLen=100;
 

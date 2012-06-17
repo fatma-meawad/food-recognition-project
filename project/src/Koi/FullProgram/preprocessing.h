@@ -15,8 +15,7 @@ class Preprocessing
 public:
     Preprocessing();
 
-    static IplImage * MakeGrayscale(IplImage *);
-    static IplImage * MakeThreshold(IplImage *, int);
+    static IplImage * MakeBinary(IplImage *);
     static IplImage * MakeHSV(IplImage *);
     static IplImage * Crop(CvRect,IplImage*);
     static IplImage * MakeDiffImage(Videocapture VC);
